@@ -33,7 +33,7 @@ export function renderMenu() {
   const totStars = Object.values(prog.career.stars).reduce((a, b) => a + b, 0);
   $('#mode-seg').innerHTML = [
     ['career', 'Carrière', `Niveau ${prog.career.max} / ${CAREER_LEVELS} · ${totStars}★`],
-    ['endless', 'Infini', 'Vagues sans fin'],
+    ['endless', 'Infini', prog.best.endless ? `Record : vague ${prog.best.endless}` : 'Vagues sans fin'],
   ]
     .map(
       ([id, n, sub]) =>

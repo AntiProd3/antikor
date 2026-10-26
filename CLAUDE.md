@@ -8,7 +8,7 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
 - Le jeu s'appelait **« Néon Horde »** jusqu'à la v0.7. Il a été renommé parce qu'un jeu Steam porte ce nom.
 - **Le jeu est découpé en modules ES** depuis la v0.8.2 : `index.html` (le squelette HTML des écrans), `css/` et `js/`. Aucune dépendance, aucune étape de construction : GitHub Pages sert les fichiers tels quels. Avant, tout tenait dans un seul `index.html` de 2 200 lignes.
 - **Langue :** l'interface, les commentaires du code et les échanges avec l'utilisateur sont en **français**. Les messages de commit sont en anglais.
-- **Version actuelle : 0.10.0.** Elle est affichée en bas à droite du jeu (`VERSION` dans `js/config.js`).
+- **Version actuelle : 1.1.0.** (Les utilisateurs appellent « 1.0 » la version 0.10.0 ; la suite est numérotée 1.1, 1.2… La liste des tâches de la 1.1 et de la 1.2 est dans `TODO.md`.) Elle est affichée en bas à droite du jeu (`VERSION` dans `js/config.js`).
 - **Un compte est obligatoire pour jouer** depuis la v0.9 : la progression (noyaux, armes, talents, box, carrière, records) est gardée sur le serveur **AntiBack** (dépôt privé `Antoinecorcos/AntiBack`, Raspberry Pi de Tibo, https://rpi5.tail085c70.ts.net). Elle suit le joueur sur tous ses appareils ; plusieurs appareils peuvent être connectés en même temps. Les sauvegardes locales d'avant la v0.9 ne sont pas reprises (décision des utilisateurs : les comptes partent de zéro).
 
 ## Dépôt et publication
@@ -38,7 +38,7 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
 - Il aime le style **néon sobre**, le côté **addictif** (box, raretés, étoiles, carte de niveaux) et la **vibe biologique**.
 - Réponses attendues en français, claires, sans jargon. On résume ce qui a changé et ce qui a été testé.
 
-## Fonctionnalités actuelles (v0.10.0)
+## Fonctionnalités actuelles (v1.1.0)
 
 ### Compte
 - Au lancement, **écran de connexion** (`#scr-login`, `js/ui/login.js`) : pseudo (3 à 16 caractères) et mot de passe (8 minimum), « Se connecter » ou « Créer un compte ». Le jeton de session est gardé dans le navigateur (`antikor-token`, 7 jours) : au prochain lancement la session reprend toute seule. Si le serveur est injoignable : message et bouton « Réessayer ».
@@ -71,6 +71,7 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
   - `spd` augmente légèrement ;
   - la densité suit `p = .05+.045k+.6t`.
   - But : une montée **régulière dans un niveau et linéaire entre niveaux**. L'ancien Marathon était trop facile au milieu et injouable à la fin.
+- **Épreuves de fin de monde** (v1.1, niveaux 5, 10, 15, 20, 25 : `isFinale()`, réglages `FINALE` dans `data/career.js`) : ennemis +45 % PV, +30 % dégâts, +6 % vitesse, plus nombreux, événements plus fréquents, boss +30 % PV. Bannière « ÉPREUVE DU MONDE N » et ligne « Épreuve » sur la fiche du niveau.
 - **Étoiles :** 1★ si on termine, 2★ avec ≥ 40 % des PV à la fin, 3★ avec ≥ 75 %.
 - **Récompenses :** bonus de noyaux au premier passage (`10+3L`), +5 par nouvelle étoile. Le niveau suivant est débloqué (`save.career.max`).
 - **Carte** façon Candy Crush (`#scr-map`, `renderMap()`) :
@@ -78,7 +79,7 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
   - nœuds avec étoiles ; le niveau courant pulse ; les niveaux 5, 10… portent « Boss du monde » ;
   - toucher un nœud ouvre une fiche (boss, difficulté, étoiles, bonus) avec JOUER.
 - **Écran de fin carrière :** « NIVEAU X TERMINÉ », étoiles animées, boutons « Niveau suivant → », « Rejouer »/« Réessayer », « Labo » et « Carte ».
-- **Infini :** l'ancien mode sans fin. Le fond change toutes les 10 vagues et un boss arrive toutes les 5 vagues. Sprint et Marathon ont été supprimés en v0.8 ; les sauvegardes sont migrées vers la Carrière.
+- **Infini :** l'ancien mode sans fin. Le fond change toutes les 10 vagues et un boss arrive toutes les 5 vagues. **Noyaux (v1.1) :** les vagues déjà franchies lors de son record rapportent 15 % (`ENDLESS_OLD` dans `rules.js`), seules celles au-delà rapportent tout ; message sur l'écran de fin, record affiché sous « Infini » dans le menu. Sprint et Marathon ont été supprimés en v0.8 ; les sauvegardes sont migrées vers la Carrière.
 
 ### Partie
 - Déplacement : ZQSD, WASD ou flèches. Sur tactile, un joystick apparaît là où le doigt se pose ; **son centre reste fixe** (v0.8.1).
@@ -86,7 +87,8 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
 - Boutique : une **relance** ne repropose pas ce qu'on vient d'acheter dans la même boutique (`shop.bought`).
 - Une boutique s'ouvre entre les vagues et se paie en **pièces**.
 - Il y a des élites (avec coffre), des événements (encerclement, nuée, mur) et des bonus au sol (cœur, aimant, bombe).
-- **Emplacements d'armes :** une partie commence avec **1 seule arme** (celle équipée). Le talent **Arsenal** monte jusqu'à 4 armes.
+- **Germes des mondes** (v1.1, `ETYPES` avec `w` = monde d'arrivée, réglages `MOB` dans `data/enemies.js`, comportements dans `sim/enemies.js`) : **Piqueur** (`dasher`, bleu, monde 2 : vise 0,55 s avec une ligne pointillée puis fonce), **Leucocyte** (`healer`, blanc, monde 3 : garde ses distances, soigne 25 % des PV des germes proches toutes les 3 s), **Pondeuse** (`brood`, vert citron, monde 4 : pond 2 petits germes toutes les 3,5 s, 6 au plus), **Neurone** (`blinker`, turquoise, monde 5 : clignote puis réapparaît près du joueur). Chacun reste dans les mondes suivants, plus fréquent dans le sien (`pickType`, `worldIndex()`). En Infini, ils arrivent avec les fonds (toutes les 10 vagues). Les nouveaux types sont toujours ajoutés **à la fin** d'`ETYPES` (leur rang sert d'identifiant dans les instantanés du duo).
+- **Emplacements d'armes :** une partie commence avec **1 seule arme** (celle équipée). Le talent **Arsenal** monte jusqu'à 3 armes (v1.1).
 - **Abandon :** aucun noyau gagné, mais les box trouvées sont gardées.
 - **Manches de boss :** le même sol en **version éclaircie** (palettes `FLOOR_LIT` / `bgLit`), avec un fondu, et les bords de l'écran qui battent comme un cœur à la couleur du boss. Un fond « tissu infecté » avait été essayé puis **rejeté** par l'utilisateur.
 - **4 boss** (`BOSSV`), dessinés dans le même style néon :
@@ -102,11 +104,12 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
   - Évolution de la Tourelle : « Sentinelles », trois tourelles volantes qui suivent le joueur. Elle demande le **Servomoteur**.
 - **Équipements (passifs) :** 15 au total, dont Réservoir (portée), Puce tactique (dégâts contre élites et boss) et Servomoteur (vitesse et cadence). Au maximum 6 en partie.
 - **Raretés** (`RARITY`) : Commun, Rare, Épique, Légendaire, Mythique.
-  - Elles augmentent les dégâts et la zone, et réduisent la recharge.
+  - Elles augmentent les dégâts et la zone, et réduisent la recharge. Depuis la v1.1, bonus plus modestes : dégâts +8 / +16 / +25 / +35 %, recharge −3 / −6 / −9 / −12 %, zone +2 à +8 %.
   - Une arme Légendaire ou Mythique commence au niveau 2, et la Mythique tire un projectile de plus.
+- **Équilibrage des armes (v1.1)** : mesuré sous Node (dégâts par seconde de chaque arme seule, ennemis 8× plus résistants, moyenne sur plusieurs graines). Écart entre la plus forte et la plus faible au niveau 5 ramené de ×2,9 à environ ×1,9 : Mines, Singularité (surtout son explosion), Molotov, Disque, Lance-flammes baissés ; Fusil à pompe, Drones, Tourelle, Rayon cryo, Arc électrique relevés ; Laser plus faible au niveau 1.
 - **Box** (`BOXES`) :
-  - **Box Souche** : 25 noyaux, de Commun à Mythique (0,4 %).
-  - **Box Mutante** : 70 noyaux, au moins Rare.
+  - **Box Souche** : 80 noyaux, de Commun à Légendaire (plus de Mythique depuis la v1.1).
+  - **Box Mutante** : 140 noyaux, au moins Rare.
   - Les box tombent aussi des boss (parfois des élites). Seul le boss de fin de monde donne une Box Mutante.
   - Chaque box donne 1 arme au hasard.
   - L'ouverture est animée : capsule bio hexagonale qui tremble et change de couleur jusqu'à la rareté obtenue.
@@ -115,7 +118,7 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
 - **Labo :**
   - les deux box directement en haut, sans sous-menu ;
   - les **talents permanents** avec icônes et couleurs : Arsenal, Vitalité, Puissance, Agilité, Magnétisme, Fortune, Capital, Blindage, Relance, Quatrième carte, Seconde chance.
-  - **Arsenal :** 120, 260 puis 450 noyaux. Le niveau n ne s'achète **qu'une fois le monde n atteint** en carrière (v0.8.1).
+  - **Arsenal (v1.1) :** 2 niveaux, 3 armes au maximum. Niveau 1 (120 noyaux) au monde 2, niveau 2 (260) au monde 3 (`talentGate`). Les comptes qui avaient l'ancien niveau 3 sont ramenés au niveau 2 et remboursés de 450 noyaux par le serveur (`upgradeProgress()` dans `rules.js`, appliquée au chargement de la progression). Les niveaux déjà achetés avant d'avoir atteint le monde requis sont gardés.
 - **Deux monnaies, à ne pas confondre :**
   - les **noyaux** sont **violets** (`--core:#c77dff`) : monnaie permanente gagnée en fin de partie, dépensée au labo ;
   - les **pièces** sont **dorées** : monnaie de la partie, dépensée dans la boutique entre les vagues, perdue à la fin.
@@ -200,13 +203,15 @@ Chaque fichier commence par une ligne qui dit ce qu'il contient. Les imports en 
 - **0.8 :** mode Carrière (25 niveaux, carte, étoiles), 5 fonds de monde, Tourelle et Servomoteur.
 - **0.8.1 :** carte en pleine largeur sur PC, « ? » sur les box, Arsenal lié aux mondes, joystick fixe.
 - **0.9.0 :** **comptes obligatoires** et progression sur le serveur AntiBack (écran de connexion, plusieurs appareils, reconnexion automatique, box tirées et récompenses calculées par le serveur, résultats de partie vérifiés), règles partagées dans `js/rules.js`, ancien duo PeerJS supprimé.
-- **0.10.0 :** **duo en ligne par le serveur** (salle avec code, l'hôte lance, Carrière et Infini, partie calculée par le serveur, anticipation du déplacement, attente de 30 s en cas de coupure, reprise après rechargement) et **classement** (top 15, 9 statistiques). Protocole 3.
+- **1.1.0 :** première moitié de `TODO.md` : noyaux de l'Infini réduits sous son record, 4 nouveaux germes (un par monde), Arsenal limité à 3 armes et lié aux mondes 2 et 3, épreuves de fin de monde, raretés moins fortes et armes rééquilibrées, box à 80 et 140 noyaux (plus de Mythique dans la Box Souche).
+- **0.10.0 (« 1.0 ») :** **duo en ligne par le serveur** (salle avec code, l'hôte lance, Carrière et Infini, partie calculée par le serveur, anticipation du déplacement, attente de 30 s en cas de coupure, reprise après rechargement) et **classement** (top 15, 9 statistiques). Protocole 3.
 - **0.8.3 :** fin de partie sans cartes « Bourse »/« Soin » (soin automatique quand tout est au maximum), plus d'infobulle sur les box, la relance de la boutique ne repropose pas l'achat qui vient d'être fait, +15 % d'XP par niveau.
 - **0.8.2 :** réorganisation du code sans changement de jeu : découpage en modules (`css/`, `js/data`, `js/sim`, `js/render`, `js/ui`, `js/net`), simulation séparée de la page (phase 0 du bilan serveur), test Node `tests/sim-bench.mjs`, chemin de l'icône iOS corrigé.
 
 ## Pistes en attente
 
 - **Fluidité du duo** (phase 4) : à mesurer en vrai sur le Pi (débit de Funnel avec beaucoup d'ennemis) ; pistes : instantanés des ennemis moins fréquents, format binaire.
+- **1.2** : deuxième moitié de `TODO.md` (XP par niveau, monstres jusqu'aux vagues 40-50 de l'Infini, événements, skins et box Halloween, récompense quotidienne, meilleurs joueurs par niveau de carrière).
 - **Difficulté du duo** : les ennemis ne sont pas plus nombreux ni plus résistants à deux (comme l'ancien duo) ; à ajuster selon les retours.
 - **Équilibrage :** les chiffres de difficulté de la carrière, des prix et des chances des box sont un premier réglage, à ajuster selon les retours.
 - Idées proposées mais pas encore validées :

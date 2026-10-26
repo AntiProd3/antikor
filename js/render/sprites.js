@@ -46,6 +46,24 @@ export const DRAW={
   g.shadowColor=gold;g.fillStyle=gold;for(const[x,y]of[[-r*.05,-r*.3],[-r*.05,r*.3],[r*.12,0]]){g.beginPath();g.arc(x,y,r*.1,0,TAU);g.fill();}
   g.fillStyle='#0a0e18';for(const[x,y]of[[-r*.05,-r*.3],[-r*.05,r*.3],[r*.12,0]]){g.beginPath();g.ellipse(x,y,r*.03,r*.08,0,0,TAU);g.fill();}},
 };
+// Germes des mondes 2 à 5 (v1.1)
+Object.assign(DRAW,{
+ dasher(g,r,c){g.strokeStyle=hexA(c,.5);g.lineWidth=r*.1;for(const y of[-r*.32,0,r*.32]){g.beginPath();g.moveTo(-r*.7,y);g.lineTo(-r*1.3,y*1.4);g.stroke();}
+  g.strokeStyle=c;g.lineWidth=r*.14;g.beginPath();g.moveTo(r*.55,0);g.quadraticCurveTo(r*.1,-r*.72,-r*.75,-r*.42);g.quadraticCurveTo(-r*.95,0,-r*.75,r*.42);g.quadraticCurveTo(r*.1,r*.72,r*.55,0);g.closePath();fillBody(g,c,.26);
+  g.strokeStyle='#fff';g.shadowColor='#fff';g.lineWidth=r*.13;g.beginPath();g.moveTo(r*.45,0);g.lineTo(r*1.45,0);g.stroke();
+  g.fillStyle='#fff';g.beginPath();g.arc(r*.05,-r*.22,r*.09,0,TAU);g.arc(r*.05,r*.22,r*.09,0,TAU);g.fill();},
+ healer(g,r,c){const gr='#62ff9a';g.strokeStyle=c;g.lineWidth=r*.11;g.beginPath();for(let i=0;i<=16;i++){const a=i/16*TAU;const rr=r*(.92+.08*Math.sin(i*2.2));i?g.lineTo(Math.cos(a)*rr,Math.sin(a)*rr):g.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);}g.closePath();fillBody(g,c,.12);
+  g.strokeStyle=hexA(c,.55);g.lineWidth=r*.07;for(const[x,y,rr]of[[-r*.28,-r*.22,r*.24],[-r*.3,r*.24,r*.22],[r*.08,0,r*.2]]){g.beginPath();g.arc(x,y,rr,0,TAU);g.stroke();}
+  g.strokeStyle=gr;g.shadowColor=gr;g.lineWidth=r*.16;g.beginPath();g.moveTo(r*.48,-r*.26);g.lineTo(r*.48,r*.26);g.moveTo(r*.22,0);g.lineTo(r*.74,0);g.stroke();},
+ brood(g,r,c){g.strokeStyle=c;g.lineWidth=r*.09;g.beginPath();g.ellipse(-r*.1,0,r*.95,r*.75,0,0,TAU);fillBody(g,c,.14);
+  g.lineWidth=r*.06;for(const[x,y,rr]of[[-r*.5,-r*.22,r*.17],[-r*.45,r*.26,r*.16],[-r*.08,-r*.32,r*.14],[-r*.05,r*.2,r*.18],[r*.3,-r*.05,r*.13]]){g.beginPath();g.arc(x,y,rr,0,TAU);g.fillStyle=hexA(c,.4);g.fill();g.stroke();}
+  g.strokeStyle=c;g.lineWidth=r*.1;g.beginPath();g.arc(r*.72,0,r*.26,-1.2,1.2);g.stroke();
+  g.fillStyle='#fff';g.shadowColor='#fff';for(const y of[-r*.13,r*.13]){g.beginPath();g.arc(r*.66,y,r*.06,0,TAU);g.fill();}},
+ blinker(g,r,c){g.strokeStyle=hexA(c,.8);g.lineWidth=r*.09;for(let i=0;i<6;i++){const a=i/6*TAU+.3;const x1=Math.cos(a)*r*.5,y1=Math.sin(a)*r*.5,x2=Math.cos(a+.25)*r*1.25,y2=Math.sin(a+.25)*r*1.25;g.beginPath();g.moveTo(x1,y1);g.quadraticCurveTo(Math.cos(a)*r*1.05,Math.sin(a)*r*1.05,x2,y2);g.stroke();
+   g.fillStyle=c;g.beginPath();g.arc(x2,y2,r*.1,0,TAU);g.fill();}
+  g.strokeStyle=c;g.lineWidth=r*.13;g.beginPath();g.arc(0,0,r*.58,0,TAU);fillBody(g,c,.25);
+  g.fillStyle='#fff';g.shadowColor='#fff';g.beginPath();g.arc(r*.1,0,r*.2,0,TAU);g.fill();g.fillStyle='#05070e';g.beginPath();g.arc(r*.16,0,r*.09,0,TAU);g.fill();},
+});
 export function hexPath(g,x,y,r,rot){g.beginPath();for(let i=0;i<6;i++){const a=rot+i/6*TAU;const px=x+Math.cos(a)*r,py=y+Math.sin(a)*r;i?g.lineTo(px,py):g.moveTo(px,py);}g.closePath();}
 // Variantes de boss : même style néon que la Couronne, silhouettes et couleurs différentes
 Object.assign(DRAW,{

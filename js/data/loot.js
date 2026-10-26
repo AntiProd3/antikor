@@ -1,12 +1,13 @@
 // Raretés des armes et box.
 
-// Bonus appliqués à l'arme pendant toute la partie (dégâts, recharge, zone, projectiles, niveau de départ)
+// Bonus appliqués à l'arme pendant toute la partie (dégâts, recharge, zone, projectiles, niveau de départ).
+// v1.1 : bonus plus modestes ; Légendaire et Mythique commencent toujours niveau 2.
 export const RARITY = [
   { name: 'Commun', col: '#a9b6cc', dmg: 1, cd: 1, area: 1, proj: 0, lvl: 1 },
-  { name: 'Rare', col: '#3ea8ff', dmg: 1.15, cd: 0.95, area: 1.04, proj: 0, lvl: 1 },
-  { name: 'Épique', col: '#b46bff', dmg: 1.32, cd: 0.9, area: 1.08, proj: 0, lvl: 1 },
-  { name: 'Légendaire', col: '#ffd23e', dmg: 1.55, cd: 0.85, area: 1.12, proj: 0, lvl: 2 },
-  { name: 'Mythique', col: '#ff3d8b', dmg: 1.85, cd: 0.8, area: 1.16, proj: 1, lvl: 2 },
+  { name: 'Rare', col: '#3ea8ff', dmg: 1.08, cd: 0.97, area: 1.02, proj: 0, lvl: 1 },
+  { name: 'Épique', col: '#b46bff', dmg: 1.16, cd: 0.94, area: 1.04, proj: 0, lvl: 1 },
+  { name: 'Légendaire', col: '#ffd23e', dmg: 1.25, cd: 0.91, area: 1.06, proj: 0, lvl: 2 },
+  { name: 'Mythique', col: '#ff3d8b', dmg: 1.35, cd: 0.88, area: 1.08, proj: 1, lvl: 2 },
 ];
 
 export function rarBonus(r) {
@@ -21,6 +22,7 @@ export function rarBonus(r) {
 }
 
 export const BOXES = {
-  std: { name: 'Box Souche', cost: 25, col: '#3ef2ff', odds: [60, 28, 9, 2.6, 0.4] },
-  prem: { name: 'Box Mutante', cost: 70, col: '#ff3d8b', odds: [0, 55, 30, 12, 3] },
+  // la Box Souche ne donne jamais de Mythique (v1.1)
+  std: { name: 'Box Souche', cost: 80, col: '#3ef2ff', odds: [60, 28, 9, 3, 0] },
+  prem: { name: 'Box Mutante', cost: 140, col: '#ff3d8b', odds: [0, 55, 30, 12, 3] },
 };

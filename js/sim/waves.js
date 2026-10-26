@@ -106,7 +106,9 @@ export function startWave(n) {
     addShake(6);
   } else if (n === 1 && G.M.career) {
     const w = worldOf(G.M.level);
-    banner('NIVEAU ' + G.M.level, 'MONDE ' + (w + 1) + ' · ' + WORLDS[w].name.toUpperCase(), WORLDS[w].col);
+    if (G.M.finale)
+      banner('ÉPREUVE DU MONDE ' + (w + 1), 'NIVEAU ' + G.M.level + ' · ENNEMIS PLUS CORIACES', '#ff3d5a');
+    else banner('NIVEAU ' + G.M.level, 'MONDE ' + (w + 1) + ' · ' + WORLDS[w].name.toUpperCase(), WORLDS[w].col);
     sfx('wave');
   } else {
     banner(

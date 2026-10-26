@@ -38,18 +38,33 @@ export function talentCost(t, l) {
   return t.costs ? t.costs[l] : t.cost * (l + 1);
 }
 
-// Arsenal : le niveau n s'achète une fois le monde n atteint en carrière (0 = pas de restriction)
+// Arsenal : le niveau n s'achète une fois le monde n + 1 atteint en carrière (monde 2 : 2 armes, monde 3 : 3 armes).
+// Renvoie le monde requis, ou 0 s'il n'y a pas de restriction.
 export function talentGate(t, l, careerMax) {
   if (t.id !== 'slot' || l >= t.max) return 0;
-  const need = l + 1;
+  const need = l + 2;
   return worldOf(careerMax) + 1 >= need ? 0 : need;
+}
+
+// Mise à niveau d'une progression enregistrée avec des règles plus anciennes (appliquée par le serveur au chargement).
+// v1.1 : Arsenal limité à 2 niveaux (3 armes) ; le niveau en trop est remboursé. Renvoie true si quelque chose a changé.
+export function upgradeProgress(prog) {
+  let changed = false;
+  const t = TALENTS.find(x => x.id === 'slot');
+  const l = prog.talents.slot || 0;
+  if (l > t.max) {
+    prog.cores += [120, 260, 450].slice(t.max, l).reduce((a, b) => a + b, 0);
+    prog.talents.slot = t.max;
+    changed = true;
+  }
+  return changed;
 }
 
 // Effet des talents achetés, tel que la partie l'utilise
 export function talentStats(talents) {
   const T = id => talents[id] || 0;
   return {
-    slots: 1 + T('slot'),
+    slots: 1 + Math.min(T('slot'), 2),
     hp: 10 * T('hp'),
     dmg: 0.05 * T('dmg'),
     spd: 0.04 * T('spd'),
@@ -152,6 +167,9 @@ export function openBox(prog, kind, buy, rnd) {
 
 // d = résultat de la partie (déjà vérifié par le serveur) : win, quit, mode, cl (niveau de carrière), hp (0 à 1),
 // wave, kills, bossKills, boxes {std, prem}, dmg, level (héros), maxCombo. Met à jour la progression et renvoie les récompenses.
+// Part des noyaux gagnés en Infini pour les vagues en dessous de son record
+export const ENDLESS_OLD = 0.15;
+
 export function runRewards(prog, d) {
   const career = d.mode === 'career';
   const waves = d.win ? d.wave : d.wave - 1;
@@ -173,7 +191,23 @@ export function runRewards(prog, d) {
       unlocked = true;
     }
   }
-  let cores = Math.floor(waves * 3 + d.kills / 40 + d.bossKills * 8 + (d.win && !career ? 20 : 0) + bonus);
+  let cores;
+  // Infini (v1.1) : les vagues déjà franchies lors de son record ne rapportent presque rien (15 %) ;
+  // seules les vagues au-delà du record rapportent tous leurs noyaux
+  const prevBest = prog.best[d.mode] || 0;
+  let underRecord = false;
+  if (!career) {
+    const prevDone = Math.max(0, prevBest - 1); // vagues terminées lors du record
+    const fresh = Math.max(0, waves - prevDone),
+      old = waves - fresh;
+    const oldBoss = Math.min(d.bossKills, Math.floor(prevDone / 5)),
+      freshBoss = d.bossKills - oldBoss;
+    const share = waves ? Math.max(ENDLESS_OLD, fresh / waves) : ENDLESS_OLD;
+    cores = Math.floor(
+      3 * fresh + 3 * ENDLESS_OLD * old + 8 * freshBoss + 8 * ENDLESS_OLD * oldBoss + (d.kills / 40) * share,
+    );
+    underRecord = old > 0;
+  } else cores = Math.floor(waves * 3 + d.kills / 40 + d.bossKills * 8 + bonus);
   cores = d.quit ? 0 : Math.max(1, cores);
   prog.cores += cores;
   prog.totalKills += d.kills;
@@ -189,5 +223,5 @@ export function runRewards(prog, d) {
   const boxes = { std: d.boxes.std | 0, prem: d.boxes.prem | 0 };
   prog.boxes.std += boxes.std;
   prog.boxes.prem += boxes.prem;
-  return { cores, stars, unlocked, newRec, boxes };
+  return { cores, stars, unlocked, newRec, boxes, underRecord, prevBest };
 }

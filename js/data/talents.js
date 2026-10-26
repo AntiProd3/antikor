@@ -7,8 +7,8 @@ export const TALENTS = [
     col: '#3ef2ff',
     name: 'Arsenal',
     desc: '+1 emplacement d’arme en partie',
-    max: 3,
-    costs: [120, 260, 450],
+    max: 2, // 3 armes au maximum (v1.1)
+    costs: [120, 260],
   },
   { id: 'hp', icon: 'heart', col: '#ff4a6b', name: 'Vitalité', desc: '+10 PV max', max: 5, cost: 10 },
   { id: 'dmg', icon: 'powder', col: '#ffb03e', name: 'Puissance', desc: '+5% de dégâts', max: 5, cost: 14 },
@@ -77,7 +77,7 @@ export const TFX = {
 };
 
 export const TNOTE = {
-  slot: 'Au départ tu n’as que l’arme équipée. Les emplacements en plus se remplissent avec les armes trouvées en partie (cartes de niveau et boutique), parmi celles de ton inventaire. Le niveau 2 se débloque au monde 2 de la carrière, le niveau 3 au monde 3.',
+  slot: 'Au départ tu n’as que l’arme équipée. Les emplacements en plus se remplissent avec les armes trouvées en partie (cartes de niveau et boutique), parmi celles de ton inventaire. Le niveau 1 se débloque au monde 2 de la carrière (2 armes), le niveau 2 au monde 3 (3 armes, le maximum).',
   hp: 'Points de vie de départ. Les PV remontent un peu entre les vagues.',
   dmg: 'S’applique à toutes tes armes.',
   spd: 'Vitesse de déplacement de ta cellule.',

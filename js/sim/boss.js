@@ -1,6 +1,6 @@
 // Boss : apparition, attaques et mort.
 
-import { careerBosses } from '../data/career.js';
+import { FINALE, careerBosses } from '../data/career.js';
 import { BOSSV } from '../data/enemies.js';
 import { addEB } from './combat.js';
 import { addShake, burst, part, ring, sfx, white } from './fx.js';
@@ -20,7 +20,9 @@ export function spawnBoss() {
   const bv = cb ? (fin ? cb.fin : cb.mid) : fin ? 'crown' : pick(pool);
   G.lastBoss = bv;
   const V = BOSSV[bv];
-  const e = spawnEnemy('boss', x, y, { hpMul: V.hp * (fin ? 2.2 : G.M.endless ? 1 + G.wave / 10 : 1) });
+  const e = spawnEnemy('boss', x, y, {
+    hpMul: V.hp * (fin ? 2.2 : G.M.endless ? 1 + G.wave / 10 : 1) * (G.M.finale ? FINALE.boss : 1),
+  });
   e.final = fin;
   e.bv = bv;
   e.col = V.col;

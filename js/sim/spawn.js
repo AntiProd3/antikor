@@ -1,5 +1,6 @@
 // Difficulté et apparition des ennemis (vagues normales, élites, événements).
 
+import { FINALE, worldOf } from '../data/career.js';
 import { ETYPES, MAX_E } from '../data/enemies.js';
 import { toast } from './fx.js';
 import { focusPl, nearestPl } from './player.js';
@@ -16,7 +17,7 @@ export function progress() {
   if (G.M.endless) return (G.wave - 1 + f) / 9;
   if (G.M.career) {
     const k = G.M.level - 1;
-    return Math.min(1.45, 0.05 + 0.045 * k + 0.6 * careerT());
+    return Math.min(1.6, 0.05 + 0.045 * k + 0.6 * careerT() + (G.M.finale ? FINALE.density : 0));
   }
   return Math.min(1.25, (G.wave - 1 + f) / (G.M.waves - 1));
 }
@@ -25,10 +26,11 @@ export function computeScale(p) {
   if (G && G.M.career) {
     const k = G.M.level - 1,
       t = careerT();
+    const F = G.M.finale ? FINALE : { hp: 1, dmg: 1, spd: 1 };
     return {
-      hp: (1 + 0.13 * k) * (1 + 1.7 * t + 2.4 * t * t),
-      spd: Math.min(1.45, 1 + 0.015 * k + 0.2 * t),
-      dmg: (1 + 0.09 * k) * (1 + 1.2 * t),
+      hp: (1 + 0.13 * k) * (1 + 1.7 * t + 2.4 * t * t) * F.hp,
+      spd: Math.min(1.5, (1 + 0.015 * k + 0.2 * t) * F.spd),
+      dmg: (1 + 0.09 * k) * (1 + 1.2 * t) * F.dmg,
     };
   }
   const q = Math.min(p, 1.6);
@@ -80,7 +82,22 @@ export function spawnPos(extra = 0, F = focusPl()) {
   return [F.x + Math.cos(a) * R, F.y + Math.sin(a) * R, a];
 }
 
+// Monde en cours : celui du niveau en carrière ; en Infini, il change toutes les 10 vagues (avec le fond)
+export function worldIndex() {
+  if (G.M.career) return worldOf(G.M.level);
+  return Math.min(4, Math.floor((G.wave - 1) / 10));
+}
+
+// Germes propres aux mondes (v1.1) : chacun arrive dans son monde, plus nombreux dans celui-ci, et reste ensuite
+const WORLD_MOBS = [
+  ['dasher', 2.5],
+  ['healer', 1.2],
+  ['brood', 1.4],
+  ['blinker', 2],
+];
+
 export function pickType(p) {
+  const w = worldIndex();
   const W = [
     ['walker', 10],
     ['runner', p > 0.08 ? 4 + 4 * p : 0],
@@ -89,6 +106,10 @@ export function pickType(p) {
     ['bomber', p > 0.38 ? 3 : 0],
     ['tank', p > 0.45 ? 2 + 3 * p : 0],
   ];
+  for (const [t, wt] of WORLD_MOBS) {
+    const tw = ETYPES[t].w;
+    if (w >= tw) W.push([t, wt * (w === tw ? 1.8 : 1)]);
+  }
   let tot = 0;
   for (const w of W) tot += w[1];
   let r = Math.random() * tot;
@@ -121,7 +142,7 @@ export function spawnTick(dt, p) {
   }
   G.eventT -= dt;
   if (G.eventT <= 0) {
-    G.eventT = rand(9, 13) * (G.isBoss ? 1.5 : 1);
+    G.eventT = rand(9, 13) * (G.isBoss ? 1.5 : 1) * (G.M.finale ? FINALE.events : 1);
     if (p > 0.15) spawnEvent(p);
   }
   if (!G.eliteDone && G.waveT > G.waveDur * 0.45) {

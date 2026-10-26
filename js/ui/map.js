@@ -1,7 +1,7 @@
 // Carte de la carrière.
 
 import { Sfx } from '../audio.js';
-import { CAREER_LEVELS, WORLDS, careerBosses, worldOf } from '../data/career.js';
+import { CAREER_LEVELS, WORLDS, careerBosses, isFinale, worldOf } from '../data/career.js';
 import { BOSSV } from '../data/enemies.js';
 import { ICON, svg } from '../icons.js';
 import { prog } from '../online/client.js';
@@ -85,11 +85,12 @@ export function levelPop(L) {
     st = prog.career.stars[L] || 0;
   const pop = $('#map-pop');
   pop.dataset.lv = L;
-  const diff = Math.ceil((L / CAREER_LEVELS) * 10);
+  const diff = Math.min(10, Math.ceil((L / CAREER_LEVELS) * 10) + (isFinale(L) ? 2 : 0));
   pop.innerHTML = `<div class="map-card cut" style="--c:${w.col}"><div class="eyebrow">Monde ${worldOf(L) + 1} · ${w.name}</div><h3>Niveau ${L}</h3>
   <div class="stars-row">${starsSvg(st)}</div>
   <dl class="kv"><dt>Manches</dt><dd>10 · boss aux manches 5 et 10</dd><dt>Boss</dt><dd><span style="color:${BOSSV[cb.mid].col}">${BOSSV[cb.mid].name}</span> puis <span style="color:${BOSSV[cb.fin].col}">${BOSSV[cb.fin].name}</span></dd>
   <dt>Difficulté</dt><dd><span class="diff">${Array.from({ length: 10 }, (_, i) => `<i class="${i < diff ? 'on' : ''}"></i>`).join('')}</span></dd>
+${isFinale(L) ? `<dt>Épreuve</dt><dd class="finale">Fin du monde ${worldOf(L) + 1} : ennemis et boss bien plus coriaces</dd>` : ''}
   <dt>Étoiles</dt><dd>1★ terminer · 2★ ≥ 40% PV · 3★ ≥ 75% PV</dd>${st ? '' : `<dt>Premier passage</dt><dd class="nk">+${10 + 3 * L} noyaux bonus</dd>`}</dl>
   <div class="btnrow"><button class="btn btn-primary cut" data-go="${L}" style="font-size:30px;padding:14px 40px">JOUER</button><button class="btn cut" data-close>Fermer</button></div></div>`;
   pop.hidden = false;

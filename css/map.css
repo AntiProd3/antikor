@@ -279,3 +279,7 @@
     transform: scale(1.3);
   }
 }
+.map-card dd.finale {
+  color: #ff3d5a;
+  font-weight: 700;
+}

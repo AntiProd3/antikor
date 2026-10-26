@@ -359,6 +359,7 @@ function applySnap(m) {
       o.fuse = f & 4 ? 1 : 0;
       o.frozen = f & 16 ? 1 : 0;
       o.burnT = f & 32 ? 1 : 0;
+      o.tele = f & 64 ? 1 : 0;
       o.r = T.r * (o.elite ? 1.5 : 1);
       o.col = T.col;
       o.hp = a[6];

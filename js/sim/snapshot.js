@@ -77,7 +77,8 @@ export function snap() {
           (x.fuse > 0 ? 4 : 0) |
           (x.type === 'boss' && x.ai.ph === 'tele' ? 8 : 0) |
           (x.frozen > 0 ? 16 : 0) |
-          (x.burnT > 0 ? 32 : 0),
+          (x.burnT > 0 ? 32 : 0) |
+          (x.tele > 0 ? 64 : 0), // Piqueur qui vise, Neurone qui clignote
         x.type === 'boss' || x.elite || x.type === 'tank' ? r2(Math.max(0, x.hp) / x.maxHp) : 1,
         x.type === 'boss' ? r2(x.ai.ang || 0) : 0,
       ]);

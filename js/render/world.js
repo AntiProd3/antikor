@@ -140,6 +140,25 @@ export function drawWorld(cam) {
       ctx.setLineDash([]);
       ctx.restore();
     }
+    // Piqueur qui vise : ligne d'avertissement ; Neurone qui va se téléporter : anneau qui clignote
+    if (e.tele > 0 && e.type === 'dasher') {
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      ctx.rotate(e.ang);
+      ctx.strokeStyle = hexA(e.col, 0.35 + 0.3 * Math.sin(G.t * 40));
+      ctx.setLineDash([10, 8]);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(e.r, 0);
+      ctx.lineTo(220, 0);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    } else if (e.tele > 0 && e.type === 'blinker') {
+      ctx.globalCompositeOperation = 'lighter';
+      drawGlow(e.col, e.x, e.y, e.r * 5 * (1 + Math.sin(G.t * 50) * 0.3), 0.7);
+      ctx.globalCompositeOperation = 'source-over';
+    }
     const wob = Math.sin(e.t * (e.type === 'runner' ? 16 : 9)) * 0.07;
     const spr = e.type === 'boss' ? SPRB[e.bv || 'crown'] : e.elite ? SPRE[e.type] : SPR[e.type];
     if (e.type === 'bomber' && e.fuse > 0) {

@@ -60,8 +60,21 @@ export function worldOf(L) {
   return Math.min(WORLDS.length - 1, Math.floor((L - 1) / 5));
 }
 
+// Dernier niveau de chaque monde (5, 10, 15…) : une vraie épreuve (v1.1)
+export const isFinale = L => L % 5 === 0;
+export const FINALE = { hp: 1.45, dmg: 1.3, spd: 1.06, density: 0.15, boss: 1.3, events: 0.65 };
+
 export function careerMode(L) {
-  return { id: 'career', name: 'Niveau ' + L, level: L, waves: 10, dur: 30, bosses: [5, 10], career: true };
+  return {
+    id: 'career',
+    name: 'Niveau ' + L,
+    level: L,
+    waves: 10,
+    dur: 30,
+    bosses: [5, 10],
+    career: true,
+    finale: isFinale(L),
+  };
 }
 
 // boss fixes par niveau (affichés sur la carte) : la Couronne garde la fin de chaque monde

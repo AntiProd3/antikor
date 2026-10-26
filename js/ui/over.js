@@ -78,6 +78,9 @@ export function showOver(d) {
       (d.quit
         ? `<span class="over-wait">Partie abandonnée : aucun noyau.</span>`
         : svg('core', 2) + `+${r.cores} noyaux <span class="cur-lbl">gardés sur ton compte</span>`) +
+      (!d.quit && r.underRecord
+        ? `<span class="over-wait note">Infini : les vagues sous ton record (vague ${r.prevBest}) rapportent peu de noyaux. Dépasse-le pour gagner plus !</span>`
+        : '') +
       (r.boxes.std
         ? ` <span class="rw-box" style="--c:${BOXES.std.col}">${svg('box', 2)}+${r.boxes.std} ${BOXES.std.name}</span>`
         : '') +
