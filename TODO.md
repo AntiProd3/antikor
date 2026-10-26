@@ -2,22 +2,13 @@
 
 ## À faire prochainement
 
-- [ ] Tester la fluidité du mode duo sur le Raspberry Pi et mesurer le débit réel de l'API de synchronisation
-- [ ] Ajuster la difficulté du duo pour refléter le comportement attendu de l'ancien mode coopératif
-- [ ] Vérifier l'équilibrage global des niveaux, des prix et des chances de box selon les retours joueurs
-- [ ] Valider les idées de contenu non encore confirmées : box quotidienne, défis récompensés, garantie d'une Épique toutes les 10 box
-- [ ] Étudier l'ajout d'une arme de type boomerang et son impact sur la progression
-- [ ] Explorer des effets uniques pour les armes Mythiques et des améliorations au-delà du niveau 5 quand tous les emplacements d'armes sont remplis
-- [ ] Contrôler les retours mobile/desktop et confirmer la lisibilité du menu, de la carte et des écrans HUD
-- [ ] Vérifier que les règles de progression partagées entre le jeu et le serveur restent cohérentes après chaque changement
+Ajouter une diversité de mobs, surtout a chasue nouveau monde
+Arsenal : Niv 1 uniquement a partir de monde 2 ( donc monde 2:2 armes 3: 3 armes... et max 3 armes)
+Les derniers niveau de monde doivent etre une vraie épreuve
+Des stats d'armes plus raisonnables et équilibrées sinpossible (moins d'augmentation des stats par rareté mais les choses du style mythique: direct niveau 2 on garde)
+Prix des box: 80, 140. pas de mythique dans la moins chere
+Nouvelle box avec des skins de personnage
+Plus d’xp necessaire par niveau, augmentation exponentielle ( fin pas complètement exponentielle mais comme les niveau dans minecraft, mais que cela demande beaucoup d’arriver niveau 12 deja quoi)
+Des nouveaux monstres a chaque nouveau monde et tout les 10 manches du mode infini (jusqua 40 50 ducoup)
+Plus d'happening en partie, comme on avait fait le Encerclement
 
-## En cours
-
-- [ ] Maintenir la compatibilité avec le serveur AntiBack et la progression des comptes
-- [ ] Valider les changements de code pour éviter toute régression sur les modules de simulation, rendu et interface
-
-## Terminé / validé
-
-- [ ] Vérifier les corrections de compatibilité de l'icône iOS et des chemins relatifs
-- [ ] Confirmer la structure modulaire du projet (`css/`, `js/data/`, `js/sim/`, `js/render/`, `js/ui/`)
-- [ ] S'assurer que les tests de simulation via Node restent utilisables pour les validations rapides
