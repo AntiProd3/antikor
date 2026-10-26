@@ -18,13 +18,11 @@ export function renderSkins() {
   for (const [id, S] of Object.entries(SKINS)) {
     const own = ownsSkin(prog, id);
     const on = (prog.skin || 'base') === id;
-    // les skins d'Halloween et de fidélité ne se montrent qu'une fois obtenus (surprise)
-    if (!own && S.src !== 'shop') continue;
-    let act;
-    if (on) act = '<span class="skin-tag on">ÉQUIPÉ</span>';
-    else if (own) act = `<button class="btn cut" data-equip-skin="${id}">Équiper</button>`;
-    else
-      act = `<button class="btn cut" data-buy-skin="${id}" ${prog.cores < S.price ? 'aria-disabled="true"' : ''}>${svg('core', 2)}${S.price}</button>`;
+    // seuls les skins possédés s'affichent (pas d'achat au labo : on les obtient par la box Halloween)
+    if (!own) continue;
+    const act = on
+      ? '<span class="skin-tag on">ÉQUIPÉ</span>'
+      : `<button class="btn cut" data-equip-skin="${id}">Équiper</button>`;
     h += `<div class="skin-card cut ${on ? 'on' : ''}"><canvas width="128" height="128" data-skin="${id}"></canvas><div><b>${S.name}</b><small>${SRC_LABEL[S.src]}</small></div>${act}</div>`;
   }
   el.innerHTML = h;
@@ -66,8 +64,8 @@ export function initSkins() {
       if (!r.ok) return notice(r.msg);
       return revealSkin(r.skin, 'BOX HALLOWEEN');
     }
-    const id = b.dataset.buySkin || b.dataset.equipSkin;
-    const r = await request(b.dataset.buySkin ? 'skin_buy' : 'skin_equip', { id });
+    const id = b.dataset.equipSkin;
+    const r = await request('skin_equip', { id });
     if (r.ok) Sfx.buy();
     else notice(r.msg);
   });

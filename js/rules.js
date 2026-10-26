@@ -152,11 +152,14 @@ function addSkin(prog, id) {
   if (!prog.skins.includes(id)) prog.skins.push(id);
 }
 
-// Achat d'un skin du labo (il est équipé tout de suite). Renvoie null si c'est fait, sinon la raison du refus.
+// Achat d'un skin au labo : désactivé (décision des utilisateurs, v1.2) ; les skins s'obtiennent par la box Halloween.
+// Mettre SKIN_SHOP à true pour le réactiver.
+export const SKIN_SHOP = false;
+
 export function buySkin(prog, id) {
   if (!Object.hasOwn(SKINS, id)) return 'unknown';
   const s = SKINS[id];
-  if (s.src !== 'shop') return 'locked';
+  if (!SKIN_SHOP || s.src !== 'shop') return 'locked';
   if (ownsSkin(prog, id)) return 'owned';
   if (prog.cores < s.price) return 'not_enough';
   prog.cores -= s.price;
