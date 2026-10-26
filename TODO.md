@@ -14,3 +14,5 @@ Plus d'happening en partie, comme on avait fait le Encerclement
 Instaurer un système de skin achetable dans le labo avec une unique box halloween par joueur 199 noyau 
 Récompense de connexion quotidienne, progressif sur 7 jours et box de skin à 7 jours (d'abord quelques noyeaux, une box souche, une mutante)
 Noter à côté de chaque niveau en carrière les 3 meilleurs qui se sont arrété à ce niveau.
+Ajoute une possibilité de rentrer des codes promo mais un truc subtil (premier code: SINGE, donne une box mutante)
+
