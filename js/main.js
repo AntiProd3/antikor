@@ -24,6 +24,7 @@ import { initMenu } from './ui/menu.js';
 import { initRank } from './ui/rank.js';
 import { initSkins } from './ui/skins.js';
 import { initDaily } from './ui/daily.js';
+import { initPromo } from './ui/promo.js';
 import { initTooltips } from './ui/tooltips.js';
 
 // Une étape de simulation (aussi utilisée par les tests) : la commande du joueur local, puis la partie avance.
@@ -82,6 +83,7 @@ initDuoUi();
 initRank();
 initSkins();
 initDaily();
+initPromo();
 addEventListener('resize', resize);
 resize();
 initFloor();

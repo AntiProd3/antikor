@@ -444,6 +444,13 @@
   color: var(--dim);
   font-size: 14px;
 }
+.promo-box {
+  width: min(100%, 380px);
+}
+.promo-box .code-in {
+  flex: none;
+  min-height: 48px;
+}
 @media (max-width: 560px) {
   .daily-days {
     grid-template-columns: repeat(4, minmax(0, 1fr));

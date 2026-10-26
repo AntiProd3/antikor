@@ -26,6 +26,7 @@ Version actuelle : **1.2.0** (affichée en bas à droite du jeu).
 - **Skins** : l'apparence du vaisseau, sans effet sur la partie. Six skins à acheter au labo (de 120 à 350 noyaux), une **Box Halloween** (199 noyaux, une seule par joueur) qui donne un des 4 skins d'Halloween, et deux skins réservés au cadeau du 7e jour.
 - **Cadeau du jour** : en se connectant chaque jour, des noyaux, des box Souche et Mutante, et une box de skin le 7e jour d'affilée. Un jour manqué fait repartir au jour 1.
 - Sur la **carte**, à côté de chaque niveau : les 3 meilleurs joueurs arrêtés à ce niveau.
+- **Codes promo** : il existe un passage secret pour les saisir…
 
 ## Boss
 
