@@ -4,7 +4,8 @@
 // Aucune dépendance à la page : ni document, ni window, ni sauvegarde.
 
 import { CAREER_LEVELS, worldOf } from './data/career.js';
-import { BOXES } from './data/loot.js';
+import { BOXES, DAILY } from './data/loot.js';
+import { HALLOWEEN, SKIN_BOX, SKINS } from './data/skins.js';
 import { TALENTS } from './data/talents.js';
 import { WEAPONS } from './data/weapons.js';
 
@@ -25,6 +26,11 @@ export function newProgress() {
     totalKills: 0,
     // pour le classement : dégâts cumulés, meilleur niveau de héros et meilleur combo en une partie
     stats: { dmg: 0, maxLevel: 0, maxCombo: 0 },
+    // v1.2 : skins possédés et équipé, skin tiré dans la box Halloween (une seule par joueur), cadeau quotidien
+    skins: [],
+    skin: 'base',
+    halloween: null,
+    daily: { last: null, day: 0 },
   };
 }
 
@@ -108,7 +114,12 @@ export function equippedItem(prog) {
 // Ce que la partie reçoit pour créer le joueur : talents, armes possédées et arme de départ
 export function playerSpec(prog) {
   const it = equippedItem(prog);
-  return { ts: talentStats(prog.talents), owned: ownedMap(prog.inv), start: { id: it.id, r: it.r } };
+  return {
+    ts: talentStats(prog.talents),
+    owned: ownedMap(prog.inv),
+    start: { id: it.id, r: it.r },
+    skin: ownsSkin(prog, prog.skin) ? prog.skin : 'base',
+  };
 }
 
 export function equip(prog, u) {
@@ -128,6 +139,98 @@ export function fuse(prog, id, r) {
   prog.inv.push(item);
   if (wasEquipped) prog.equip = item.u;
   return { item };
+}
+
+// ---------- Skins (v1.2) ----------
+
+export function ownsSkin(prog, id) {
+  return id === 'base' || (Object.hasOwn(SKINS, id) && (prog.skins || []).includes(id));
+}
+
+function addSkin(prog, id) {
+  prog.skins = prog.skins || [];
+  if (!prog.skins.includes(id)) prog.skins.push(id);
+}
+
+// Achat d'un skin du labo (il est équipé tout de suite). Renvoie null si c'est fait, sinon la raison du refus.
+export function buySkin(prog, id) {
+  if (!Object.hasOwn(SKINS, id)) return 'unknown';
+  const s = SKINS[id];
+  if (s.src !== 'shop') return 'locked';
+  if (ownsSkin(prog, id)) return 'owned';
+  if (prog.cores < s.price) return 'not_enough';
+  prog.cores -= s.price;
+  addSkin(prog, id);
+  prog.skin = id;
+  return null;
+}
+
+export function equipSkin(prog, id) {
+  if (!ownsSkin(prog, id)) return 'unknown';
+  prog.skin = id;
+  return null;
+}
+
+// Box Halloween : une seule par joueur, un skin d'Halloween tiré au sort (le Squelette est le plus rare)
+export function openHalloween(prog, rnd) {
+  if (prog.halloween) return { error: 'opened' };
+  if (prog.cores < HALLOWEEN.cost) return { error: 'not_enough' };
+  const pool = Object.keys(SKINS).filter(k => SKINS[k].src === 'halloween');
+  let x = rnd() * pool.reduce((a, k) => a + SKINS[k].odds, 0),
+    id = pool[pool.length - 1];
+  for (const k of pool) {
+    x -= SKINS[k].odds;
+    if (x < 0) {
+      id = k;
+      break;
+    }
+  }
+  prog.cores -= HALLOWEEN.cost;
+  addSkin(prog, id);
+  prog.halloween = id;
+  prog.skin = id;
+  return { skin: id };
+}
+
+// Box de skin (cadeau du 7e jour) : un skin du labo ou de fidélité pas encore possédé, sinon des noyaux
+export function rollSkinBox(prog, rnd) {
+  const pool = Object.keys(SKINS).filter(
+    k => (SKINS[k].src === 'shop' || SKINS[k].src === 'daily') && !ownsSkin(prog, k),
+  );
+  if (!pool.length) {
+    prog.cores += SKIN_BOX.fallbackCores;
+    return { cores: SKIN_BOX.fallbackCores };
+  }
+  const id = pool[Math.floor(rnd() * pool.length)];
+  addSkin(prog, id);
+  return { skin: id };
+}
+
+// ---------- Cadeau de connexion (v1.2) ----------
+// today et yesterday : dates du jour et de la veille ('AAAA-MM-JJ', heure de Paris), données par le serveur
+
+export function dailyNext(prog, today, yesterday) {
+  const d = prog.daily || { last: null, day: 0 };
+  if (d.last === today) return { can: false, day: d.day };
+  return { can: true, day: d.last === yesterday ? (d.day % DAILY.length) + 1 : 1 };
+}
+
+export function claimDaily(prog, today, yesterday, rnd) {
+  const st = dailyNext(prog, today, yesterday);
+  if (!st.can) return { error: 'already' };
+  const R = DAILY[st.day - 1];
+  const reward = { day: st.day };
+  if (R.cores) {
+    prog.cores += R.cores;
+    reward.cores = R.cores;
+  }
+  if (R.box) {
+    prog.boxes[R.box]++;
+    reward.box = R.box;
+  }
+  if (R.skinBox) Object.assign(reward, rollSkinBox(prog, rnd));
+  prog.daily = { last: today, day: st.day };
+  return reward;
 }
 
 // ---------- Box ----------

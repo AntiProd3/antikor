@@ -4,9 +4,9 @@ import { Sfx } from '../audio.js';
 import { CAREER_LEVELS, WORLDS, careerBosses, isFinale, worldOf } from '../data/career.js';
 import { BOSSV } from '../data/enemies.js';
 import { ICON, svg } from '../icons.js';
-import { prog } from '../online/client.js';
+import { account, prog, request } from '../online/client.js';
 import { setG, setP } from '../sim/state.js';
-import { $, currentScreen, show } from './dom.js';
+import { $, currentScreen, esc, show } from './dom.js';
 import { startGame } from './game.js';
 
 /* ---------- Carte de la carrière : chemin sinueux, niveau 1 en bas ---------- */
@@ -17,7 +17,18 @@ export function starsSvg(n, cls = '') {
     .join('');
 }
 
+// Joueurs arrêtés à chaque niveau (v1.2) : { niveau: { top: [{ name, stars }], n } }, demandé au serveur
+let board = {};
+
+async function loadBoard() {
+  const r = await request('career_board');
+  if (!r.ok) return;
+  board = r.levels || {};
+  if (currentScreen() === 'scr-map') renderMap();
+}
+
 export function openMap(focus) {
+  loadBoard();
   setG(null);
   setP(null);
   $('#hud').hidden = true;
@@ -73,6 +84,12 @@ export function renderMap() {
       cur = L === mx;
     const big = L % 5 === 0;
     h += `<button class="lv ${locked ? 'locked' : ''} ${cur ? 'cur' : ''} ${big ? 'big' : ''}" data-lv="${L}" style="left:${p.x}px;top:${p.y}px;--c:${w.col}">${big && !locked ? '<span class="crown">BOSS DU MONDE</span>' : ''}${locked ? svg('lock') : L}${locked ? '' : `<span class="st">${starsSvg(st)}</span>`}</button>`;
+    // les 3 meilleurs joueurs arrêtés à ce niveau, du côté opposé au virage du chemin
+    const b = board[L];
+    if (b && b.top.length) {
+      const side = p.x < W / 2 ? 'r' : 'l';
+      h += `<div class="lv-who ${side}" style="${side === 'r' ? 'left' : 'right'}:${side === 'r' ? p.x + 46 : W - p.x + 46}px;top:${p.y}px">${b.top.map(x => `<span class="${x.name === account.name ? 'me' : ''}">${esc(x.name)}</span>`).join('')}${b.n > b.top.length ? `<small>+${b.n - b.top.length}</small>` : ''}</div>`;
+    }
   }
   inner.innerHTML = h;
   const tot = Object.values(prog.career.stars).reduce((a, b) => a + b, 0);
@@ -91,6 +108,7 @@ export function levelPop(L) {
   <dl class="kv"><dt>Manches</dt><dd>10 · boss aux manches 5 et 10</dd><dt>Boss</dt><dd><span style="color:${BOSSV[cb.mid].col}">${BOSSV[cb.mid].name}</span> puis <span style="color:${BOSSV[cb.fin].col}">${BOSSV[cb.fin].name}</span></dd>
   <dt>Difficulté</dt><dd><span class="diff">${Array.from({ length: 10 }, (_, i) => `<i class="${i < diff ? 'on' : ''}"></i>`).join('')}</span></dd>
 ${isFinale(L) ? `<dt>Épreuve</dt><dd class="finale">Fin du monde ${worldOf(L) + 1} : ennemis et boss bien plus coriaces</dd>` : ''}
+${board[L] && board[L].top.length ? `<dt>Arrêtés ici</dt><dd>${board[L].top.map(x => esc(x.name) + ' ' + x.stars + '★').join(' · ')}${board[L].n > board[L].top.length ? ` · +${board[L].n - board[L].top.length}` : ''}</dd>` : ''}
   <dt>Étoiles</dt><dd>1★ terminer · 2★ ≥ 40% PV · 3★ ≥ 75% PV</dd>${st ? '' : `<dt>Premier passage</dt><dd class="nk">+${10 + 3 * L} noyaux bonus</dd>`}</dl>
   <div class="btnrow"><button class="btn btn-primary cut" data-go="${L}" style="font-size:30px;padding:14px 40px">JOUER</button><button class="btn cut" data-close>Fermer</button></div></div>`;
   pop.hidden = false;

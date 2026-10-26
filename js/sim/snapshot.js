@@ -1,7 +1,7 @@
 // Instantané de la partie (duo) : le serveur le fabrique avec snap(), le jeu l'affiche (js/online/duo.js).
 // Le format est défini ici, au même endroit pour les deux côtés.
 
-import { ETYPES } from '../data/enemies.js';
+import { ETYPES, MOB } from '../data/enemies.js';
 import { EV } from './fx.js';
 import { G } from './state.js';
 
@@ -25,10 +25,12 @@ export function plSnap(pl) {
     gn: pl.gone ? 1 : 0, // a quitté la partie
     aw: pl.away ? 1 : 0, // connexion perdue (la partie l'attend)
     nm: pl.name || '',
+    sk: pl.skin,
     q: pl.sq || 0, // dernière commande de déplacement appliquée…
     qt: r2(pl.qt || 0), // …depuis combien de secondes (le jeu corrige sa propre anticipation)
     rv: r2(pl.rev),
-    sp: R0(pl.speed),
+    sp: R0(pl.speed * (pl.slowT > 0 ? MOB.latcher.slow : 1)), // vitesse du moment (ralenti par un Anticorps)
+    sl: pl.slowT > 0 ? 1 : 0,
     c: Math.floor(pl.coins),
     w: pl.weapons.map(w => {
       const a = [w.id, w.lvl, w.evo ? 1 : 0, w.r || 0];
@@ -78,7 +80,8 @@ export function snap() {
           (x.type === 'boss' && x.ai.ph === 'tele' ? 8 : 0) |
           (x.frozen > 0 ? 16 : 0) |
           (x.burnT > 0 ? 32 : 0) |
-          (x.tele > 0 ? 64 : 0), // Piqueur qui vise, Neurone qui clignote
+          (x.tele > 0 ? 64 : 0) | // Piqueur qui vise, Neurone qui clignote, Synapse qui se charge
+          (x.gold ? 128 : 0), // germe doré (Ruée d'or)
         x.type === 'boss' || x.elite || x.type === 'tank' ? r2(Math.max(0, x.hp) / x.maxHp) : 1,
         x.type === 'boss' ? r2(x.ai.ang || 0) : 0,
       ]);
@@ -98,6 +101,7 @@ export function snap() {
     .filter(x => !x.dead)
     .map(x => [R0(x.x), R0(x.y), R0(x.R), r2(x.life), r2(x.max), x.evo ? 1 : 0, x.k === 'hole' ? 1 : 0]);
   const mi = G.mines.filter(x => !x.dead).map(x => [R0(x.x), R0(x.y), x.arm > 0 ? 1 : 0, x.evo ? 1 : 0]);
+  const h = G.warn.map(x => [R0(x.x), R0(x.y), x.R, r2(x.t / x.max)]); // spores qui vont exploser
   const ev = EV.splice(0);
-  return { t: 's', g, p: G.players.map(plSnap), e, b, q, k, z, m: mi, ev };
+  return { t: 's', g, p: G.players.map(plSnap), e, b, q, k, z, m: mi, h, ev };
 }

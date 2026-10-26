@@ -24,8 +24,9 @@ export function renderDuo() {
   const r = duo.room;
   let h;
   if (!r) {
-    h = `<div class="duo-row"><button class="btn btn-gold cut" data-duo="create">Créer une salle</button><input class="code-in cut" id="code-in" maxlength="5" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Code de la salle d’un ami" value="${esc(typed)}"><button class="btn cut" data-duo="join">Rejoindre</button></div>`;
-    h += `<p class="duo-status ${err ? 'err' : ''}">${esc(err || 'Crée une salle et donne son code, ou saisis celui d’un ami.')}</p>`;
+    h = `<div class="duo-row"><button class="btn btn-gold cut" data-duo="create">Créer une salle</button><input class="code-in cut" id="code-in" maxlength="5" placeholder="CODE" title="Crée une salle et donne son code, ou saisis celui d’un ami" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Code de la salle d’un ami" value="${esc(typed)}"><button class="btn cut" data-duo="join">Rejoindre</button></div>`;
+    // une ligne d'erreur seulement si besoin : le menu doit tenir sans défilement en 1280×720
+    if (err) h += `<p class="duo-status err">${esc(err)}</p>`;
   } else {
     const names = r.members
       .map(

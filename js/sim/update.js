@@ -1,14 +1,15 @@
 // Une image de simulation : update() fait avancer toute la partie de dt secondes.
 
+import { MOB } from '../data/enemies.js';
 import { RARITY } from '../data/loot.js';
-import { explode, updateRevive } from './combat.js';
+import { explode, hurtPlayer, updateRevive } from './combat.js';
 import { updateEnemies } from './enemies.js';
 import { gameOver, openLevel, openShop } from './flow.js';
-import { weaponFx } from './fx.js';
+import { burst, weaponFx } from './fx.js';
 import { buildGrid } from './grid.js';
 import { updatePickups } from './pickups.js';
 import { updateBullets, updateEBullets, updateZones } from './projectiles.js';
-import { computeScale, progress, spawnTick } from './spawn.js';
+import { computeScale, progress, sporeTick, spawnTick } from './spawn.js';
 import { G, ME, P, setP, setWM } from './state.js';
 import { endWave, isFinal } from './waves.js';
 import { updateWeapon } from './weapons.js';
@@ -68,6 +69,19 @@ export function update(dt, rdt) {
     }
   }
   compact(G.booms);
+  // événements : spores qui explosent, fièvre
+  if (G.state === 'play') sporeTick(dt);
+  for (const w of G.warn) {
+    w.t -= dt;
+    if (w.t > 0) continue;
+    w.dead = true;
+    burst(w.x, w.y, '#ff4a3d', 10, 220, 3);
+    if (G.state === 'play')
+      for (const pl of G.players)
+        if (!pl.down && Math.hypot(pl.x - w.x, pl.y - w.y) < w.R + pl.r) hurtPlayer(pl, w.dmg);
+  }
+  compact(G.warn);
+  if (G.feverT > 0) G.feverT -= dt;
   updateCosmetics(dt, rdt);
   if (G.comboT > 0) {
     G.comboT -= dt;
@@ -152,8 +166,9 @@ export function updateCosmetics(dt, rdt) {
 
 // Déplacement d'un joueur selon sa commande [x, y] (aussi utilisé par le jeu en duo pour anticiper son propre vaisseau)
 export function movePlayer(pl, [ix, iy], dt) {
-  const tx = ix * pl.speed,
-    ty = iy * pl.speed;
+  const sp = pl.speed * slowFactor(pl);
+  const tx = ix * sp,
+    ty = iy * sp;
   const k = Math.min(1, dt * 14);
   pl.vx += (tx - pl.vx) * k;
   pl.vy += (ty - pl.vy) * k;
@@ -162,12 +177,18 @@ export function movePlayer(pl, [ix, iy], dt) {
   pl.moving = Math.hypot(ix, iy) > 0.1;
 }
 
+// Ralentissement (Anticorps accroché)
+export function slowFactor(pl) {
+  return pl.slowT > 0 ? MOB.latcher.slow : 1;
+}
+
 export function updatePlayer(pl, dt) {
   if (G.state === 'dying' || pl.down) {
     pl.vx = pl.vy = 0;
     pl.moving = false;
     return;
   }
+  if (pl.slowT > 0) pl.slowT -= dt;
   movePlayer(pl, pl.in || [0, 0], dt);
   if (pl.moving) pl.step += dt * 14;
   if (pl.inv > 0) pl.inv -= dt;

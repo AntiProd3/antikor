@@ -353,3 +353,99 @@
 .over-wait.err {
   color: var(--red);
 }
+
+/* ---------- Cadeau du jour (v1.2) ---------- */
+.daily {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(2, 3, 8, 0.78);
+}
+.daily[hidden] {
+  display: none;
+}
+.daily-box {
+  width: min(100%, 720px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  background: #0a1122;
+}
+.daily-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.dday {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 4px;
+  border: 1px solid var(--line);
+  background: rgba(12, 20, 40, 0.85);
+  color: var(--c);
+  text-align: center;
+}
+.dday .dn {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.dday svg {
+  width: 26px;
+  height: 26px;
+}
+.dday b {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 18px;
+}
+.dday small {
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--dim);
+}
+.dday.today {
+  border-color: var(--c);
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--c) 45%, transparent),
+    inset 0 0 0 1px var(--c);
+  animation: dpulse 1.2s ease-in-out infinite;
+}
+@keyframes dpulse {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.dday.got {
+  opacity: 0.45;
+}
+.dday i {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-style: normal;
+  color: var(--green);
+}
+.dday.big {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 16%, transparent), rgba(12, 20, 40, 0.85));
+}
+.daily-note {
+  margin: 0;
+  color: var(--dim);
+  font-size: 14px;
+}
+@media (max-width: 560px) {
+  .daily-days {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

@@ -1,7 +1,7 @@
 // Difficulté et apparition des ennemis (vagues normales, élites, événements).
 
 import { FINALE, worldOf } from '../data/career.js';
-import { ETYPES, MAX_E } from '../data/enemies.js';
+import { ETYPES, EVENT, MAX_E, MOB } from '../data/enemies.js';
 import { toast } from './fx.js';
 import { focusPl, nearestPl } from './player.js';
 import { G, view } from './state.js';
@@ -94,6 +94,10 @@ const WORLD_MOBS = [
   ['healer', 1.2],
   ['brood', 1.4],
   ['blinker', 2],
+  ['zigzag', 1.6],
+  ['latcher', 2],
+  ['spiker', 1.8],
+  ['pulser', 1.8],
 ];
 
 export function pickType(p) {
@@ -137,6 +141,7 @@ export function spawnTick(dt, p) {
     if (Math.random() < p * 0.8) n++;
     if (Math.random() < p - 0.6) n++;
     const type = pickType(p);
+    if (type === 'zigzag') n += MOB.zigzag.pack;
     const [x, y] = spawnPos();
     for (let i = 0; i < n; i++) spawnEnemy(type, x + rand(-30, 30), y + rand(-30, 30));
   }
@@ -154,11 +159,37 @@ export function spawnTick(dt, p) {
   }
 }
 
+// Événements en pleine vague (« happenings »). Chacun a un poids et une condition (difficulté p, monde).
 export function spawnEvent(p) {
-  const r = Math.random();
-  const R = Math.max(view.hw, view.hh) * 0.95 + 40;
-  const F = focusPl();
-  if (r < 0.45) {
+  const w = worldIndex();
+  const EV = [
+    ['encircle', 4.5],
+    ['swarm', 3.5],
+    ['wall', p > 0.45 ? 2 : 0],
+    ['splitters', p <= 0.45 ? 2 : 0.6],
+    ['spores', p > 0.25 ? 2.2 : 0], // v1.2
+    ['fever', p > 0.35 ? 1.6 : 0],
+    ['gold', 1.2],
+    ['pack', w >= 1 ? 2 : 0],
+  ];
+  let tot = 0;
+  for (const e of EV) tot += e[1];
+  let r = Math.random() * tot,
+    k = 'encircle';
+  for (const e of EV) {
+    r -= e[1];
+    if (r <= 0) {
+      k = e[0];
+      break;
+    }
+  }
+  EVENTS[k](p, w);
+}
+
+const EVENTS = {
+  encircle(p) {
+    const R = Math.max(view.hw, view.hh) * 0.95 + 40;
+    const F = focusPl();
     const n = Math.round(14 + 16 * Math.min(p, 1.2));
     const tp = p > 0.6 && Math.random() < 0.4 ? 'runner' : 'walker';
     for (let i = 0; i < n; i++) {
@@ -166,7 +197,10 @@ export function spawnEvent(p) {
       spawnEnemy(tp, F.x + Math.cos(a) * R, F.y + Math.sin(a) * R);
     }
     toast('ENCERCLEMENT', 'Ils arrivent de partout.', '#ff4a6b');
-  } else if (r < 0.8) {
+  },
+  swarm(p) {
+    const R = Math.max(view.hw, view.hh) * 0.95 + 40;
+    const F = focusPl();
     const [, , a] = spawnPos(0, F);
     const n = 10 + Math.round(14 * p);
     const c = Math.cos(a),
@@ -177,7 +211,10 @@ export function spawnEvent(p) {
       spawnEnemy('runner', F.x + c * d - s * o, F.y + s * d + c * o);
     }
     toast('NUÉE', 'Coureurs en approche.', '#ff9b3d');
-  } else if (p > 0.45) {
+  },
+  wall(p) {
+    const R = Math.max(view.hw, view.hh) * 0.95 + 40;
+    const F = focusPl();
     const [, , a] = spawnPos(0, F);
     const n = 4 + Math.round(4 * p);
     const c = Math.cos(a),
@@ -187,8 +224,63 @@ export function spawnEvent(p) {
       spawnEnemy('tank', F.x + c * R - s * o, F.y + s * R + c * o);
     }
     toast('MUR', 'Une ligne de colosses.', '#a66bff');
-  } else {
-    const [x, y] = spawnPos(0, F);
+  },
+  splitters() {
+    const [x, y] = spawnPos(0, focusPl());
     for (let i = 0; i < 6; i++) spawnEnemy('splitter', x + rand(-50, 50), y + rand(-50, 50));
-  }
+  },
+  // Pluie de spores : des cercles rouges apparaissent autour des joueurs et explosent un peu plus tard
+  spores(p) {
+    G.sporeT = 5;
+    G.sporeK = 0;
+    G.sporeDmg = 14 * G.scale.dmg;
+    toast('PLUIE DE SPORES', 'Sors des cercles rouges !', '#ff4a3d');
+  },
+  // Fièvre : tous les germes vont plus vite pendant quelques secondes
+  fever() {
+    G.feverT = EVENT.fever.time;
+    toast('FIÈVRE', 'Les germes s’emballent !', '#ff3d5a');
+  },
+  // Ruée d'or : des germes dorés fuient le joueur ; les attraper rapporte des pièces
+  gold() {
+    const F = focusPl();
+    const [x, y] = spawnPos(-120, F);
+    for (let i = 0; i < EVENT.gold.n; i++) {
+      const e = spawnEnemy('walker', x + rand(-60, 60), y + rand(-60, 60));
+      e.gold = EVENT.gold.life;
+      e.col = '#ffd23e';
+    }
+    toast('RUÉE D’OR', 'Des germes dorés fuient : rattrape-les !', '#ffd23e');
+  },
+  // Essaim : une meute du germe propre au monde en cours
+  pack(p, w) {
+    const pool = Object.keys(ETYPES).filter(t => ETYPES[t].w === w);
+    const t = pick(pool);
+    const [x, y] = spawnPos(0, focusPl());
+    const n = t === 'zigzag' ? 14 : 7;
+    for (let i = 0; i < n; i++) spawnEnemy(t, x + rand(-70, 70), y + rand(-70, 70));
+    toast('ESSAIM', ETYPES[t].name + ' en meute.', ETYPES[t].col);
+  },
+};
+
+// Pluie de spores : une spore toutes les 0,35 s pendant l'événement
+export function sporeTick(dt) {
+  if (!(G.sporeT > 0)) return;
+  G.sporeT -= dt;
+  G.sporeK -= dt;
+  if (G.sporeK > 0) return;
+  G.sporeK = 0.35;
+  const pl = pick(G.players.filter(q => !q.down)) || G.players[0];
+  const a = rand(TAU),
+    r = rand(0, 190);
+  // une spore sur trois vise exactement l'endroit où va le joueur
+  const lead = Math.random() < 0.33 ? 0.9 : 0;
+  G.warn.push({
+    x: pl.x + pl.vx * lead + (lead ? 0 : Math.cos(a) * r),
+    y: pl.y + pl.vy * lead + (lead ? 0 : Math.sin(a) * r),
+    R: EVENT.spores.R,
+    t: EVENT.spores.delay,
+    max: EVENT.spores.delay,
+    dmg: G.sporeDmg,
+  });
 }

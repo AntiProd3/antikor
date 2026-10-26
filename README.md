@@ -8,7 +8,7 @@ Jeu d'arcade néon en HTML/CSS/JavaScript sans dépendance, publié avec GitHub 
 - Code : `index.html` (écrans), `css/` (styles), `js/` (jeu : `data/` réglages, `sim/` simulation, `render/` dessin, `ui/` interface, `online/` connexion au serveur) ; `js/rules.js` contient les règles de progression partagées avec le serveur
 - En local : lancer un petit serveur dans le dossier (`python3 -m http.server`) puis ouvrir http://localhost:8000/ (ouvrir le fichier directement ne marche pas avec les modules)
 
-Version actuelle : **1.1.0** (affichée en bas à droite du jeu).
+Version actuelle : **1.2.0** (affichée en bas à droite du jeu).
 
 ## Armes, raretés et box
 
@@ -21,6 +21,12 @@ Version actuelle : **1.1.0** (affichée en bas à droite du jeu).
 - Une partie abandonnée ne rapporte aucun noyau (les box trouvées sont conservées).
 - 15 armes, dont Lance-flammes, Rayon cryo, Katana néon, Singularité (0.4) et Tourelle (0.8, évolution « Sentinelles » : tourelles volantes qui suivent le joueur).
 
+## Skins et cadeau du jour (v1.2)
+
+- **Skins** : l'apparence du vaisseau, sans effet sur la partie. Six skins à acheter au labo (de 120 à 350 noyaux), une **Box Halloween** (199 noyaux, une seule par joueur) qui donne un des 4 skins d'Halloween, et deux skins réservés au cadeau du 7e jour.
+- **Cadeau du jour** : en se connectant chaque jour, des noyaux, des box Souche et Mutante, et une box de skin le 7e jour d'affilée. Un jour manqué fait repartir au jour 1.
+- Sur la **carte**, à côté de chaque niveau : les 3 meilleurs joueurs arrêtés à ce niveau.
+
 ## Boss
 
 Quatre boss au style néon, chacun avec ses attaques : **La Ruche** (renforts), **L'Œil** (spirales de projectiles), **Le Titan** (charges rapides, très résistant) et **La Couronne** (boss final).
@@ -32,7 +38,9 @@ Quatre boss au style néon, chacun avec ses attaques : **La Ruche** (renforts), 
 - Carte façon « chemin » : niveau suivant débloqué en cas de victoire, 1 à 3 étoiles selon les PV restants (40 % et 75 %).
 - Bonus de noyaux au premier passage et pour chaque nouvelle étoile ; Box Mutante sur le boss de fin de monde.
 - Le dernier niveau de chaque monde (5, 10, 15, 20, 25) est une **épreuve** : ennemis et boss bien plus coriaces.
-- Chaque monde amène un nouveau germe : Piqueur (Plasma, fonce après avoir visé), Leucocyte (Lymphe, soigne les autres), Pondeuse (Moelle, pond des petits germes), Neurone (Cortex, se téléporte près de toi).
+- Chaque monde amène deux nouveaux germes : Piqueur et Plaquette (Plasma), Leucocyte et Anticorps (Lymphe), Pondeuse et Ostéoclaste (Moelle), Neurone et Synapse (Cortex).
+- Plus d'événements en pleine vague : encerclement, nuée, mur, pluie de spores, fièvre, ruée d'or, essaim.
+- Les niveaux du héros demandent de plus en plus d'XP (par paliers, comme dans Minecraft) : atteindre le niveau 12 est un vrai objectif.
 - Le mode **Infini** reste disponible (le fond et les nouveaux germes arrivent toutes les 10 vagues). Les vagues sous son record rapportent très peu de noyaux : il faut battre son record pour en gagner beaucoup.
 
 ## Compte et modes

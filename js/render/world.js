@@ -7,6 +7,8 @@ import { drawGlow, drawSprite, inView } from './render.js';
 import { SPR, SPRB, SPRE, glow, splat } from './sprites.js';
 import { plName } from '../sim/player.js';
 import { G, ME } from '../sim/state.js';
+import { MOB } from '../data/enemies.js';
+import { heroBody, skinLook } from './hero.js';
 import { TAU, hexA, lerp, rand } from '../util.js';
 
 export function drawWorld(cam) {
@@ -121,6 +123,22 @@ export function drawWorld(cam) {
     drawPickup(k);
   }
   ctx.globalCompositeOperation = 'source-over';
+  // spores (Pluie de spores) : cercle rouge qui se remplit jusqu'à l'explosion
+  for (const w of G.warn) {
+    if (!inView(cam, w.x, w.y, w.R + 10)) continue;
+    const f = 1 - Math.max(0, w.t / w.max);
+    ctx.fillStyle = hexA('#ff4a3d', 0.08 + 0.22 * f);
+    ctx.beginPath();
+    ctx.arc(w.x, w.y, w.R * f, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = hexA('#ff4a3d', 0.55 + 0.35 * Math.sin(G.t * 30));
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.arc(w.x, w.y, w.R, 0, TAU);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
   // enemies
   for (const e of G.enemies) {
     if (e.dead || !inView(cam, e.x, e.y, e.r * 2 + 20)) continue;
@@ -154,6 +172,15 @@ export function drawWorld(cam) {
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.restore();
+    } else if (e.tele > 0 && e.type === 'pulser') {
+      // Synapse qui se charge : la zone de la décharge clignote
+      ctx.strokeStyle = hexA(e.col, 0.4 + 0.4 * Math.sin(G.t * 40));
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, MOB.pulser.R, 0, TAU);
+      ctx.stroke();
+      ctx.fillStyle = hexA(e.col, 0.08);
+      ctx.fill();
     } else if (e.tele > 0 && e.type === 'blinker') {
       ctx.globalCompositeOperation = 'lighter';
       drawGlow(e.col, e.x, e.y, e.r * 5 * (1 + Math.sin(G.t * 50) * 0.3), 0.7);
@@ -164,6 +191,11 @@ export function drawWorld(cam) {
     if (e.type === 'bomber' && e.fuse > 0) {
       ctx.globalCompositeOperation = 'lighter';
       drawGlow('#ff4a3d', e.x, e.y, e.r * 6 * (1 + Math.sin(G.t * 40) * 0.3), 0.8);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    if (e.gold) {
+      ctx.globalCompositeOperation = 'lighter';
+      drawGlow('#ffd23e', e.x, e.y, e.r * 5, 0.9);
       ctx.globalCompositeOperation = 'source-over';
     }
     if (e.elite) {
@@ -646,57 +678,34 @@ export function drawHero(P) {
   const blink = P.inv > 0 && Math.floor(G.t * 20) % 2 === 0;
   if (blink && G.state === 'play') ctx.globalAlpha = 0.45;
   const bob = P.moving ? Math.sin(P.step) * 0.06 : 0;
+  const look = skinLook(P.skin, P.col, G.t, P.i);
   ctx.fillStyle = 'rgba(0,0,0,.35)';
   ctx.beginPath();
   ctx.ellipse(P.x, P.y + 12, 14, 5, 0, 0, TAU);
   ctx.fill();
+  // en duo avec un skin, un anneau à la couleur du joueur permet de se reconnaître
+  if (G.players.length > 1 && look.col !== P.col) {
+    ctx.strokeStyle = hexA(P.col, 0.7);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(P.x, P.y + 12, 17, 6, 0, 0, TAU);
+    ctx.stroke();
+  }
+  // ralenti par un Anticorps : anneau mauve
+  if (P.slowT > 0 || P.slowed) {
+    ctx.strokeStyle = hexA('#a0a8ff', 0.6 + 0.3 * Math.sin(G.t * 20));
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.arc(P.x, P.y, 21, 0, TAU);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
   ctx.save();
   ctx.translate(P.x, P.y);
   ctx.rotate(P.aim);
   ctx.scale(1 + bob, 1 - bob);
-  ctx.shadowColor = P.col;
-  ctx.shadowBlur = 14;
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
-  // backpack
-  ctx.fillStyle = '#0b1828';
-  ctx.strokeStyle = P.col;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.roundRect ? ctx.roundRect(-17, -8, 8, 16, 3) : ctx.rect(-17, -8, 8, 16);
-  ctx.fill();
-  ctx.stroke();
-  // gun
-  ctx.fillStyle = '#163045';
-  ctx.beginPath();
-  ctx.rect(4, -3.5, 20, 7);
-  ctx.fill();
-  ctx.strokeStyle = '#e8fbff';
-  ctx.lineWidth = 1.8;
-  ctx.stroke();
-  // body
-  ctx.fillStyle = '#0b1c2a';
-  ctx.strokeStyle = P.col;
-  ctx.lineWidth = 2.6;
-  ctx.beginPath();
-  ctx.arc(0, 0, 13, 0, TAU);
-  ctx.fill();
-  ctx.stroke();
-  ctx.fillStyle = hexA(P.col, 0.18);
-  ctx.fill();
-  // shoulders
-  ctx.strokeStyle = hexA(P.col, 0.7);
-  ctx.lineWidth = 1.6;
-  ctx.beginPath();
-  ctx.arc(0, 0, 8, 1.9, 4.4);
-  ctx.stroke();
-  // visor
-  ctx.shadowColor = '#ffffff';
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 3.2;
-  ctx.beginPath();
-  ctx.arc(2, 0, 7, -0.9, 0.9);
-  ctx.stroke();
+  heroBody(ctx, look, G.t);
   ctx.restore();
   ctx.globalAlpha = 1;
   ctx.shadowBlur = 0;

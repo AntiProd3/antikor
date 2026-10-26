@@ -9,6 +9,7 @@ import { renderBox } from './boxes.js';
 import { pips } from './cards.js';
 import { $, flashDeny, notice, show } from './dom.js';
 import { renderMenu } from './menu.js';
+import { renderSkins } from './skins.js';
 import { retip } from './tooltips.js';
 
 export function renderLab() {
@@ -16,6 +17,7 @@ export function renderLab() {
   const nb = prog.boxes.std + prog.boxes.prem;
   $('#lab-box-sub').textContent = nb ? nb + ' à ouvrir' : 'une arme au hasard, aussi lâchées par les boss';
   renderBox();
+  renderSkins();
   setTimeout(retip);
   $('#lab-talents').innerHTML = TALENTS.map((t, i) => {
     const l = T(t.id);

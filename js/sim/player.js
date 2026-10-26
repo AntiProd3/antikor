@@ -6,9 +6,12 @@ import { pick } from '../util.js';
 
 export const PCOLS = ['#3ef2ff', '#ff6ad5'];
 
-// XP nécessaire pour passer le niveau l (+15 % depuis la v0.8.3 : un peu moins de montées de niveau)
+// XP nécessaire pour passer le niveau l (v1.2, par paliers comme dans Minecraft) : les premiers niveaux
+// viennent vite, puis chaque niveau coûte nettement plus cher à partir du niveau 6, et encore plus à partir du 12
 export function xpFor(l) {
-  return Math.round((5 + l * 5 + l * l * 0.35) * 1.15);
+  if (l <= 5) return 12 + 6 * l;
+  if (l <= 11) return 42 + 35 * (l - 5);
+  return 252 + 60 * (l - 11);
 }
 
 // spec = {ts: talents, owned: {arme: meilleure rareté possédée}, start: {id, r} arme équipée}
@@ -41,6 +44,7 @@ export function mkPlayer(i, spec) {
     shop: { offers: [], rerolls: 0, free: 0, bought: [] },
     pend: 0,
     name: spec.name || '', // pseudo du compte (duo)
+    skin: spec.skin || 'base', // apparence (v1.2)
     kills: 0, // éliminations faites par ce joueur
     dmgDone: 0,
     gone: false, // a quitté la partie (duo)

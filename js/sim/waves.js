@@ -36,6 +36,9 @@ export function newRun(mode, specs, level) {
     decals: [],
     flashes: [],
     booms: [],
+    warn: [], // spores qui vont exploser (événement « Pluie de spores »)
+    sporeT: 0,
+    feverT: 0,
     spawnT: 0,
     eventT: 9,
     eliteDone: true,
@@ -122,6 +125,9 @@ export function startWave(n) {
 
 export function endWave() {
   G.state = 'clear';
+  G.warn.length = 0;
+  G.sporeT = 0;
+  G.feverT = 0;
   G.clearT = 1.5;
   for (const e of G.enemies) if (!e.dead) killEnemy(e, true);
   G.ebullets.length = 0;

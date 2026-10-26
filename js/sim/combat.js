@@ -1,6 +1,6 @@
 // Combat : projectiles, dégâts, mort des ennemis, butin, dégâts subis par les joueurs.
 
-import { ETYPES } from '../data/enemies.js';
+import { ETYPES, EVENT, MOB } from '../data/enemies.js';
 import { bossDown } from './boss.js';
 import {
   addShake,
@@ -145,6 +145,23 @@ export function killEnemy(e, silent) {
   if (e.frozen > 0 && e.shatter)
     for (let k = 0; k < 6; k++) shot(e.x, e.y, (k / 6) * TAU + rand(0.3), 480, 22, 1, 0.45, '#bff9ff', 4, 80);
   if (e.type === 'bomber') G.booms.push({ x: e.x, y: e.y, t: 0.09, R: 75, dmg: 30 + 10 * G.wave, hurt: 0 });
+  // Ostéoclaste : éclats d'os tout autour à sa mort
+  if (e.type === 'spiker') {
+    const M = MOB.spiker;
+    for (let k = 0; k < M.shards; k++) {
+      const a = (k / M.shards) * TAU + rand(0.2);
+      addEB({
+        x: e.x,
+        y: e.y,
+        vx: Math.cos(a) * M.speed,
+        vy: Math.sin(a) * M.speed,
+        r: 5,
+        dmg: e.dmg * M.dmg,
+        life: 1.6,
+        col: e.col,
+      });
+    }
+  }
   if (e.elite) {
     G.hitstop = Math.max(G.hitstop, 0.08);
     addShake(8);
@@ -163,6 +180,7 @@ export function dropLoot(e) {
     return;
   }
   addPickup('gem', e.x, e.y, e.xp);
+  if (e.gold) for (let i = 0; i < EVENT.gold.coins; i++) addPickup('coin', e.x, e.y, 2, true);
   if (Math.random() < T.coin) addPickup('coin', e.x + rand(-6, 6), e.y + rand(-6, 6), e.type === 'tank' ? 2 : 1);
   if (e.elite) {
     addPickup('chest', e.x, e.y);

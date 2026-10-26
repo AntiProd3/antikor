@@ -161,6 +161,7 @@ function begin(m) {
     flashes: [],
     decals: [],
     booms: [],
+    warn: [],
     players: [],
     cam: { x: 0, y: 0 },
     shake: 0,
@@ -296,8 +297,10 @@ function applySnap(m) {
     o.gone = !!s.gn;
     o.away = !!s.aw;
     o.name = s.nm;
+    o.skin = s.sk;
     o.rev = s.rv;
     o.speed = s.sp;
+    o.slowed = !!s.sl;
     o.coins = s.c;
     o.passives = s.ps || {};
     if (i === ME) reconcile(o, s);
@@ -360,6 +363,7 @@ function applySnap(m) {
       o.frozen = f & 16 ? 1 : 0;
       o.burnT = f & 32 ? 1 : 0;
       o.tele = f & 64 ? 1 : 0;
+      o.gold = f & 128 ? 1 : 0;
       o.r = T.r * (o.elite ? 1.5 : 1);
       o.col = T.col;
       o.hp = a[6];
@@ -417,6 +421,7 @@ function applySnap(m) {
     evo: !!a[5],
     k: a[6] ? 'hole' : 'fire',
   }));
+  G.warn = (m.h || []).map(a => ({ x: a[0], y: a[1], R: a[2], t: a[3], max: 1 }));
   G.mines = m.m.map((a, i) => ({ x: a[0], y: a[1], arm: a[2], evo: !!a[3], t: G.t + i * 0.7 }));
   for (const a of m.ev) {
     const f = FXR[a[0]];

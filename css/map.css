@@ -283,3 +283,37 @@
   color: #ff3d5a;
   font-weight: 700;
 }
+/* joueurs arrêtés à ce niveau (v1.2) */
+.lv-who {
+  position: absolute;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+  max-width: 120px;
+}
+.lv-who.l {
+  align-items: flex-end;
+}
+.lv-who span {
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  background: rgba(7, 11, 22, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.lv-who span.me {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+.lv-who small {
+  font-size: 10px;
+  opacity: 0.8;
+}

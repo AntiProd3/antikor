@@ -15,6 +15,18 @@ export const ETYPES = {
   healer: { r: 15, hp: 30, spd: 55, dmg: 8, xp: 3, col: '#eafff7', kb: 0.9, coin: 0.5, w: 2, name: 'Leucocyte' },
   brood: { r: 20, hp: 60, spd: 40, dmg: 14, xp: 4, col: '#c8ff3e', kb: 0.5, coin: 0.6, w: 3, name: 'Pondeuse' },
   blinker: { r: 13, hp: 22, spd: 75, dmg: 13, xp: 3, col: '#4affe0', kb: 1, coin: 0.5, w: 4, name: 'Neurone' },
+  // v1.2 : un second germe par monde
+  zigzag: { r: 9, hp: 9, spd: 118, dmg: 7, xp: 1, col: '#ff9f80', kb: 1.3, coin: 0.15, w: 1, name: 'Plaquette' },
+  latcher: { r: 13, hp: 26, spd: 88, dmg: 6, xp: 2, col: '#a0a8ff', kb: 1, coin: 0.4, w: 2, name: 'Anticorps' },
+  spiker: { r: 17, hp: 40, spd: 52, dmg: 12, xp: 3, col: '#f5e6c8', kb: 0.7, coin: 0.5, w: 3, name: 'Ostéoclaste' },
+  pulser: { r: 14, hp: 28, spd: 70, dmg: 10, xp: 3, col: '#e6a8ff', kb: 0.9, coin: 0.5, w: 4, name: 'Synapse' },
+};
+
+// Événements en pleine vague (v1.2)
+export const EVENT = {
+  spores: { R: 55, delay: 1.2 }, // cercles qui explosent 1,2 s après leur apparition
+  fever: { time: 8, speed: 1.45 }, // +45 % de vitesse pendant 8 s
+  gold: { n: 8, life: 10, coins: 6 }, // 8 germes dorés qui fuient 10 s et lâchent 6 pièces chacun
 };
 
 // Réglages des comportements des nouveaux germes
@@ -23,6 +35,10 @@ export const MOB = {
   healer: { keep: 250, every: 3, R: 150, heal: 0.25 }, // garde ses distances, soigne 25 % des PV autour de lui
   brood: { every: 3.5, n: 2, max: 6 }, // pond 2 petits germes toutes les 3,5 s (6 au plus)
   blinker: { every: [3.5, 5], warn: 0.5, near: [90, 130] }, // clignote puis réapparaît près du joueur
+  zigzag: { pack: 3, weave: 7 }, // arrive en grappe (3 de plus), avance en zigzag
+  latcher: { slow: 0.6, time: 1.5 }, // au contact, le joueur avance à 60 % de sa vitesse pendant 1,5 s
+  spiker: { shards: 8, speed: 260, dmg: 0.8 }, // à sa mort, 8 éclats d'os (80 % de ses dégâts)
+  pulser: { range: 130, charge: 0.8, R: 125, dmg: 1.8, rest: 3 }, // se charge puis décharge autour de lui
 };
 
 export const MAX_E = 380;

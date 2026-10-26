@@ -2,7 +2,7 @@
 
 import { bossAI } from './boss.js';
 import { addEB, dmgEnemy, hurtPlayer } from './combat.js';
-import { MAX_E, MOB } from '../data/enemies.js';
+import { EVENT, MAX_E, MOB } from '../data/enemies.js';
 import { burst, enemyFx, ring, sfx } from './fx.js';
 import { CELL, forNear, gk, grid } from './grid.js';
 import { nearestPl, owner } from './player.js';
@@ -43,8 +43,20 @@ export function updateEnemies(dt) {
         e.stun -= dt;
         sp = 0;
       }
+      if (G.feverT > 0) sp *= EVENT.fever.speed;
       let mx = dx,
         my = dy;
+      // germe doré (Ruée d'or) : il fuit, puis disparaît
+      if (e.gold) {
+        mx = -dx;
+        my = -dy;
+        e.gold -= dt;
+        if (e.gold <= 0) {
+          e.dead = true;
+          burst(e.x, e.y, '#ffd23e', 6, 120, 2);
+          continue;
+        }
+      }
       if (e.type === 'spitter') {
         if (d < 230) {
           mx = -dx * 0.5 - dy * 0.85;
@@ -150,6 +162,29 @@ export function updateEnemies(dt) {
           e.blinkT = rand(...M.every);
           e.tele = M.warn;
         }
+      } else if (e.type === 'zigzag') {
+        // Plaquette : avance en zigzag
+        const s = Math.sin(e.t * MOB.zigzag.weave) * 0.9;
+        mx = dx - dy * s;
+        my = dy + dx * s;
+      } else if (e.type === 'pulser') {
+        // Synapse : s'approche, se charge (tele), puis décharge autour d'elle
+        const M = MOB.pulser;
+        e.cool = (e.cool ?? 1) - dt;
+        if (e.tele > 0) {
+          e.tele -= dt;
+          sp = 0;
+          if (e.tele <= 0) {
+            ring(e.x, e.y, 10, M.R, 0.35, e.col);
+            sfx('zap');
+            if (G.state === 'play')
+              for (const pl of G.players)
+                if (!pl.down && Math.hypot(pl.x - e.x, pl.y - e.y) < M.R + pl.r) hurtPlayer(pl, e.dmg * M.dmg);
+          }
+        } else if (e.cool <= 0 && d < M.range && G.state === 'play' && e.stun <= 0) {
+          e.tele = M.charge;
+          e.cool = M.rest + M.charge;
+        }
       } else if (e.type === 'bomber') {
         if (e.fuse > 0) {
           e.fuse -= dt;
@@ -206,7 +241,11 @@ export function updateEnemies(dt) {
     if (G.state === 'play')
       for (const pl of G.players) {
         if (pl.down) continue;
-        if (Math.hypot(pl.x - e.x, pl.y - e.y) < e.r + pl.r - 2) hurtPlayer(pl, e.dmg);
+        if (Math.hypot(pl.x - e.x, pl.y - e.y) < e.r + pl.r - 2) {
+          hurtPlayer(pl, e.dmg);
+          // Anticorps : s'accroche et ralentit le joueur
+          if (e.type === 'latcher') pl.slowT = MOB.latcher.time;
+        }
       }
     if (d > farR && e.type !== 'boss') {
       const [x, y] = spawnPos();

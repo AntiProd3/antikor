@@ -21,6 +21,18 @@ export function rarBonus(r) {
   return b.length ? b.join(' · ') : 'Statistiques de base';
 }
 
+// Cadeau de connexion (v1.2) : un par jour, 7 jours de suite ; un jour manqué fait repartir au jour 1,
+// et après le 7e jour on recommence au jour 1
+export const DAILY = [
+  { cores: 20 },
+  { cores: 30 },
+  { box: 'std' },
+  { cores: 50 },
+  { box: 'std' },
+  { box: 'prem' },
+  { skinBox: true },
+];
+
 export const BOXES = {
   // la Box Souche ne donne jamais de Mythique (v1.1)
   std: { name: 'Box Souche', cost: 80, col: '#3ef2ff', odds: [60, 28, 9, 3, 0] },
