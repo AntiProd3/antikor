@@ -10,6 +10,7 @@ import { renderInv } from './inventory.js';
 import { renderLab } from './lab.js';
 import { renderMap } from './map.js';
 import { renderMenu } from './menu.js';
+import { narrowStage, spin, weighted } from './roulette.js';
 
 export function renderBox() {
   $('#box-list').innerHTML = Object.entries(BOXES)
@@ -23,10 +24,13 @@ export function renderBox() {
     .join('');
 }
 
-// Ouverture : la box tremble et change de couleur jusqu'à sa vraie rareté, puis l'arme apparaît
-export let boTO = [];
-
+// Ouverture : l'arme est tirée par le serveur, puis une roue de possibilités (en gris) défile
+// et s'arrête sur l'arme obtenue, qui s'allume à la couleur de sa rareté (v1.2.1)
 let opening = false;
+
+// Case de la roue pour une arme : icône, nom, bande de la couleur de rareté
+export const weaponTile = it =>
+  `<span class="ico" style="--c:${WEAPONS[it.id].col}">${svg(it.id)}</span><b>${WEAPONS[it.id].name}</b><small>${RARITY[it.r].name}</small>`;
 
 export async function openBox(k, buy) {
   if (opening) return;
@@ -34,64 +38,43 @@ export async function openBox(k, buy) {
     Sfx.deny();
     return;
   }
-  // le serveur tire l'arme ; la box tremble pendant ce temps
   opening = true;
-  for (const t of boTO) clearTimeout(t);
-  boTO = [];
   const ov = $('#box-open');
   ov.hidden = false;
   ov.dataset.k = k;
   ov.onclick = null;
+  narrowStage();
   $('#bo-stage').innerHTML =
-    `<div class="bo-box shake" id="bo-box" style="--gc:${BOXES[k].col}">${boxArt()}</div><div class="bo-hint">Ouverture…</div>`;
+    `<div class="bo-box shake" style="--gc:${BOXES[k].col}">${boxArt()}</div><div class="bo-hint">Ouverture…</div>`;
   Sfx.init();
   Sfx.unbox();
   const r = await request('box_open', { kind: k, buy });
-  opening = false;
   if (!r.ok) {
+    opening = false;
     ov.hidden = true;
     notice(r.msg);
     return;
   }
-  const it = r.item,
-    isNew = r.isNew;
-  const box = $('#bo-box');
-  const steps = [];
-  for (let r = 0; r <= it.r; r++) steps.push(r);
-  const dt = Math.max(260, 1100 / steps.length);
-  steps.forEach((r, i) =>
-    boTO.push(
-      setTimeout(
-        () => {
-          box.style.setProperty('--gc', RARITY[r].col);
-          Sfx.click();
-        },
-        300 + i * dt,
-      ),
-    ),
-  );
-  boTO.push(
-    setTimeout(
-      () => {
-        box.classList.remove('shake');
-        box.classList.add('pop');
-      },
-      400 + steps.length * dt,
-    ),
-  );
-  boTO.push(setTimeout(() => showReveal(it, isNew), 700 + steps.length * dt));
-  ov.onclick = e => {
-    if (e.target.closest('button')) return;
-    if ($('#bo-box') && !$('.bo-card')) {
-      for (const t of boTO) clearTimeout(t);
-      showReveal(it, isNew);
-    }
-  };
+  const it = r.item;
+  // cases de remplissage : raretés tirées avec les chances de la box, armes au hasard
+  const ids = Object.keys(WEAPONS);
+  const odds = BOXES[k].odds.map((o, i) => [i, o]).filter(x => x[1] > 0);
+  await spin({
+    title: BOXES[k].name,
+    win: it,
+    filler: () => ({ id: ids[Math.floor(Math.random() * ids.length)], r: weighted(odds) }),
+    tile: weaponTile,
+    col: x => RARITY[x.r].col,
+    reveal: it.r,
+  });
+  opening = false;
+  showReveal(it, r.isNew);
 }
 
 export function showReveal(it, isNew, title) {
   const ov = $('#box-open');
   ov.hidden = false;
+  narrowStage();
   const d = WEAPONS[it.id],
     R = RARITY[it.r];
   const k = ov.dataset.k || 'std';

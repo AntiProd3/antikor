@@ -7,6 +7,7 @@ import { prog, request } from '../online/client.js';
 import { drawSkinPreview } from '../render/hero.js';
 import { ownsSkin } from '../rules.js';
 import { $, flashDeny, notice } from './dom.js';
+import { narrowStage, spin, weighted } from './roulette.js';
 
 export function renderSkins() {
   const el = $('#lab-skins');
@@ -29,10 +30,24 @@ export function renderSkins() {
   for (const cv of el.querySelectorAll('canvas[data-skin]')) drawSkinPreview(cv, cv.dataset.skin, 0.5);
 }
 
+// Roue d'un tirage de skin (v1.2.1) : pool = skins possibles, avec leurs chances (odds) ou à égalité
+export function spinSkin(win, pool, title) {
+  return spin({
+    title,
+    win,
+    filler: () => weighted(pool.map(id => [id, SKINS[id].odds || 1])),
+    tile: id => `<canvas width="96" height="96"></canvas><b>${SKINS[id].name}</b>`,
+    col: id => (SKINS[id].col && SKINS[id].col !== 'prism' ? SKINS[id].col : '#ffffff'),
+    after: (id, el) => drawSkinPreview(el.querySelector('canvas'), id, 0.5),
+    reveal: 4,
+  });
+}
+
 // Révélation d'un skin obtenu (box Halloween, cadeau du 7e jour)
 export function revealSkin(id, title, sub = 'équipé') {
   const ov = $('#box-open');
   ov.hidden = false;
+  narrowStage();
   ov.dataset.k = '';
   const S = SKINS[id];
   $('#bo-stage').innerHTML = `<div class="bo-new">${title}</div>
@@ -62,6 +77,9 @@ export function initSkins() {
     if (b.dataset.hw !== undefined) {
       const r = await request('skin_box', { kind: 'halloween' });
       if (!r.ok) return notice(r.msg);
+      Sfx.unbox();
+      const pool = Object.keys(SKINS).filter(k => SKINS[k].src === 'halloween');
+      await spinSkin(r.skin, pool, HALLOWEEN.name);
       return revealSkin(r.skin, 'BOX HALLOWEEN');
     }
     const id = b.dataset.equipSkin;

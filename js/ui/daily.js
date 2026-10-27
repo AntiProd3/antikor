@@ -3,12 +3,12 @@
 
 import { Sfx } from '../audio.js';
 import { BOXES, DAILY } from '../data/loot.js';
-import { SKIN_BOX } from '../data/skins.js';
+import { SKIN_BOX, SKINS } from '../data/skins.js';
 import { svg } from '../icons.js';
 import { request } from '../online/client.js';
 import { refreshMeta } from './boxes.js';
 import { $, notice } from './dom.js';
-import { revealSkin } from './skins.js';
+import { revealSkin, spinSkin } from './skins.js';
 
 const label = R =>
   R.cores
@@ -60,6 +60,9 @@ async function claim() {
   refreshMeta();
   if (r.skin) {
     $('#daily').hidden = true;
+    // la roue montre les skins que pouvait donner la box (ceux du labo et de fidélité)
+    const pool = Object.keys(SKINS).filter(k => SKINS[k].src === 'shop' || SKINS[k].src === 'daily');
+    await spinSkin(r.skin, pool, SKIN_BOX.name);
     revealSkin(r.skin, 'CADEAU DU 7E JOUR', 'ajouté à tes skins (labo)');
   }
 }

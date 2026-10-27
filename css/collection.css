@@ -584,3 +584,119 @@
   display: block;
   margin: 0 auto 6px;
 }
+
+/* ---------- Roue d'ouverture des box (v1.2.1) ---------- */
+.bo-stage.wide {
+  width: min(100%, 900px);
+}
+.rl {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: rgba(7, 11, 22, 0.9);
+  /* les bords s'effacent : on voit les cases arriver et partir */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+.rl-track {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  display: flex;
+  gap: 8px;
+  will-change: transform;
+}
+.rl-tile {
+  box-sizing: border-box;
+  width: 120px;
+  height: 120px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-bottom: 4px solid var(--rc);
+  background: linear-gradient(180deg, rgba(20, 30, 54, 0.9), color-mix(in srgb, var(--rc) 16%, #0a1122));
+  text-align: center;
+  /* toutes les possibilités en gris… */
+  filter: grayscale(1) brightness(0.55);
+  transition:
+    filter 0.35s,
+    transform 0.35s,
+    box-shadow 0.35s;
+}
+.rl-tile .ico {
+  width: 46px;
+  height: 46px;
+  color: var(--c);
+}
+.rl-tile .ico svg {
+  width: 100%;
+  height: 100%;
+}
+.rl-tile canvas {
+  width: 64px;
+  height: 64px;
+}
+.rl-tile b {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.1;
+}
+.rl-tile small {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rc);
+}
+/* …et celle obtenue s'allume à sa couleur */
+.rl-tile.win {
+  filter: none;
+  transform: scale(1.08);
+  border-color: var(--rc);
+  box-shadow:
+    0 0 28px color-mix(in srgb, var(--rc) 70%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--rc) 35%, transparent);
+  animation: rlwin 0.9s ease-in-out infinite alternate;
+}
+@keyframes rlwin {
+  to {
+    box-shadow:
+      0 0 44px color-mix(in srgb, var(--rc) 90%, transparent),
+      inset 0 0 24px color-mix(in srgb, var(--rc) 45%, transparent);
+  }
+}
+/* repère central */
+.rl-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--gold);
+  box-shadow: 0 0 12px var(--gold);
+}
+.rl-mark::before,
+.rl-mark::after {
+  content: '';
+  position: absolute;
+  left: -7px;
+  border: 8px solid transparent;
+}
+.rl-mark::before {
+  top: 0;
+  border-top-color: var(--gold);
+}
+.rl-mark::after {
+  bottom: 0;
+  border-bottom-color: var(--gold);
+}

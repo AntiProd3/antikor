@@ -8,7 +8,7 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
 - Le jeu s'appelait **« Néon Horde »** jusqu'à la v0.7. Il a été renommé parce qu'un jeu Steam porte ce nom.
 - **Le jeu est découpé en modules ES** depuis la v0.8.2 : `index.html` (le squelette HTML des écrans), `css/` et `js/`. Aucune dépendance, aucune étape de construction : GitHub Pages sert les fichiers tels quels. Avant, tout tenait dans un seul `index.html` de 2 200 lignes.
 - **Langue :** l'interface, les commentaires du code et les échanges avec l'utilisateur sont en **français**. Les messages de commit sont en anglais.
-- **Version actuelle : 1.2.0.** (Les utilisateurs appellent « 1.0 » la version 0.10.0 ; la suite est numérotée 1.1, 1.2… La liste des tâches de la 1.1 et de la 1.2 est dans `TODO.md`.) Elle est affichée en bas à droite du jeu (`VERSION` dans `js/config.js`).
+- **Version actuelle : 1.2.1.** (Les utilisateurs appellent « 1.0 » la version 0.10.0 ; la suite est numérotée 1.1, 1.2… La liste des tâches de la 1.1 et de la 1.2 est dans `TODO.md`.) Elle est affichée en bas à droite du jeu (`VERSION` dans `js/config.js`).
 - **Un compte est obligatoire pour jouer** depuis la v0.9 : la progression (noyaux, armes, talents, box, carrière, records) est gardée sur le serveur **AntiBack** (dépôt privé `Antoinecorcos/AntiBack`, Raspberry Pi de Tibo, https://rpi5.tail085c70.ts.net). Elle suit le joueur sur tous ses appareils ; plusieurs appareils peuvent être connectés en même temps. Les sauvegardes locales d'avant la v0.9 ne sont pas reprises (décision des utilisateurs : les comptes partent de zéro).
 
 ## Dépôt et publication
@@ -38,7 +38,7 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
 - Il aime le style **néon sobre**, le côté **addictif** (box, raretés, étoiles, carte de niveaux) et la **vibe biologique**.
 - Réponses attendues en français, claires, sans jargon. On résume ce qui a changé et ce qui a été testé.
 
-## Fonctionnalités actuelles (v1.2.0)
+## Fonctionnalités actuelles (v1.2.1)
 
 ### Compte
 - Au lancement, **écran de connexion** (`#scr-login`, `js/ui/login.js`) : pseudo (3 à 16 caractères) et mot de passe (8 minimum), « Se connecter » ou « Créer un compte ». Le jeton de session est gardé dans le navigateur (`antikor-token`, 7 jours) : au prochain lancement la session reprend toute seule. Si le serveur est injoignable : message et bouton « Réessayer ».
@@ -115,7 +115,7 @@ Document de passation pour reprendre le travail dans une nouvelle conversation. 
   - **Box Mutante** : 140 noyaux, au moins Rare.
   - Les box tombent aussi des boss (parfois des élites). Seul le boss de fin de monde donne une Box Mutante.
   - Chaque box donne 1 arme au hasard.
-  - L'ouverture est animée : capsule bio hexagonale qui tremble et change de couleur jusqu'à la rareté obtenue.
+  - **Ouverture en roue** (v1.2.1, `js/ui/roulette.js`, façon CS:GO) : la capsule tremble pendant que le serveur tire l'arme, puis une bande horizontale de 46 cases défile 5 s et ralentit jusqu'à l'objet obtenu (case n° 38), sous un repère doré. Toutes les cases sont en gris ; la gagnante s'allume à la couleur de sa rareté. Les cases de remplissage suivent les chances de la box. Un clic ou une touche va directement à la fin. Même roue pour la Box Halloween (les 4 skins, selon leurs chances) et la box de skin du 7e jour. La largeur des cases est mesurée sur la page (pas de valeur en dur).
   - Un nouveau joueur reçoit 1 Box Souche.
 - **Inventaire** (menu uniquement) : on y équipe l'arme de départ, et **3 exemplaires identiques fusionnent** en une rareté supérieure. En partie, **seules les armes possédées** apparaissent, avec la meilleure rareté possédée.
 - **Labo :**
@@ -207,6 +207,7 @@ Chaque fichier commence par une ligne qui dit ce qu'il contient. Les imports en 
 - **0.8 :** mode Carrière (25 niveaux, carte, étoiles), 5 fonds de monde, Tourelle et Servomoteur.
 - **0.8.1 :** carte en pleine largeur sur PC, « ? » sur les box, Arsenal lié aux mondes, joystick fixe.
 - **0.9.0 :** **comptes obligatoires** et progression sur le serveur AntiBack (écran de connexion, plusieurs appareils, reconnexion automatique, box tirées et récompenses calculées par le serveur, résultats de partie vérifiés), règles partagées dans `js/rules.js`, ancien duo PeerJS supprimé.
+- **1.2.1 :** ouverture des box en roue horizontale façon CS:GO (box d'armes, Box Halloween, box de skin du 7e jour) ; achat de skins au labo retiré (seule la Box Halloween en donne, plus la box du 7e jour).
 - **1.2.0 :** seconde moitié de `TODO.md` : XP par paliers (niveau 12 bien plus long), 4 germes de plus (deux par monde ; en Infini, deux nouveaux toutes les 10 vagues jusqu'à la 41e), 4 événements (spores, fièvre, ruée d'or, essaim), skins et Box Halloween unique, cadeau du jour sur 7 jours, joueurs arrêtés à chaque niveau sur la carte, codes promo cachés (SINGE). Protocole 4.
 - **1.1.0 :** première moitié de `TODO.md` : noyaux de l'Infini réduits sous son record, 4 nouveaux germes (un par monde), Arsenal limité à 3 armes et lié aux mondes 2 et 3, épreuves de fin de monde, raretés moins fortes et armes rééquilibrées, box à 80 et 140 noyaux (plus de Mythique dans la Box Souche).
 - **0.10.0 (« 1.0 ») :** **duo en ligne par le serveur** (salle avec code, l'hôte lance, Carrière et Infini, partie calculée par le serveur, anticipation du déplacement, attente de 30 s en cas de coupure, reprise après rechargement) et **classement** (top 15, 9 statistiques). Protocole 3.
