@@ -18,8 +18,9 @@ export const SKINS = {
   aurora: { name: 'Aurore', src: 'daily', col: '#ff6ad5', col2: '#3ef2ff', deco: 'halo' },
 };
 
-// Box Halloween : une seule par joueur
-export const HALLOWEEN = { name: 'Box Halloween', cost: 199, col: '#ff8c1a' };
+// Box Halloween : une seule par joueur jusqu'à `again` ; à partir de ce moment (27 octobre 2026, 18 h à Paris),
+// elle s'achète à nouveau autant de fois qu'on veut, et ne donne qu'un skin d'Halloween pas encore possédé
+export const HALLOWEEN = { name: 'Box Halloween', cost: 199, col: '#ff8c1a', again: Date.UTC(2026, 9, 27, 17) };
 
 // Box de skin du 7e jour : un skin du labo ou de fidélité pas encore possédé ; s'il n'y en a plus, des noyaux
 export const SKIN_BOX = { name: 'Box de skin', col: '#62ff9a', fallbackCores: 150 };

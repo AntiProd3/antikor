@@ -1,21 +1,32 @@
-// Skins au labo (v1.2) : box Halloween (une par joueur), skins à acheter, équiper.
+// Skins au labo (v1.2) : box Halloween (une par joueur, puis rachetable pour les skins manquants), équiper.
 
 import { Sfx } from '../audio.js';
 import { HALLOWEEN, SKINS, SRC_LABEL } from '../data/skins.js';
 import { svg } from '../icons.js';
 import { prog, request } from '../online/client.js';
 import { drawSkinPreview } from '../render/hero.js';
-import { ownsSkin } from '../rules.js';
+import { halloweenOpen, halloweenPool, ownsSkin } from '../rules.js';
 import { $, flashDeny, notice } from './dom.js';
 import { narrowStage, spin, weighted } from './roulette.js';
 
 export function renderSkins() {
   const el = $('#lab-skins');
   const hw = prog.halloween;
-  const canHw = !hw && prog.cores >= HALLOWEEN.cost;
-  let h = `<div class="skin-card hw cut" style="--c:${HALLOWEEN.col}"><canvas width="128" height="128" data-skin="${hw || 'pumpkin'}" class="${hw ? '' : 'mystery'}"></canvas>
-  <div><b>${HALLOWEEN.name}</b><small>${hw ? 'Ouverte : ' + SKINS[hw].name : 'Une seule par joueur · un skin d’Halloween au hasard'}</small></div>
-  ${hw ? '<span class="skin-tag">OUVERTE</span>' : `<button class="btn btn-gold cut" data-hw ${canHw ? '' : 'aria-disabled="true"'}>Ouvrir · <span class="nk">${svg('core', 2)}${HALLOWEEN.cost}</span></button>`}</div>`;
+  const again = halloweenOpen(Date.now());
+  const left = halloweenPool(prog, Date.now()).length;
+  // ouverte (avant la réouverture) ou tous les skins d'Halloween déjà possédés : plus rien à acheter
+  const shut = again ? !left : !!hw;
+  const canHw = !shut && prog.cores >= HALLOWEEN.cost;
+  const sub = shut
+    ? again
+      ? 'Tu as les 4 skins d’Halloween !'
+      : 'Ouverte : ' + SKINS[hw].name
+    : again
+      ? `Un skin d’Halloween que tu n’as pas encore · ${left} restant${left > 1 ? 's' : ''}`
+      : 'Une seule par joueur · un skin d’Halloween au hasard';
+  let h = `<div class="skin-card hw cut" style="--c:${HALLOWEEN.col}"><canvas width="128" height="128" data-skin="${shut && hw ? hw : 'pumpkin'}" class="${shut ? '' : 'mystery'}"></canvas>
+  <div><b>${HALLOWEEN.name}</b><small>${sub}</small></div>
+  ${shut ? `<span class="skin-tag">${again ? 'COMPLÈTE' : 'OUVERTE'}</span>` : `<button class="btn btn-gold cut" data-hw ${canHw ? '' : 'aria-disabled="true"'}>Ouvrir · <span class="nk">${svg('core', 2)}${HALLOWEEN.cost}</span></button>`}</div>`;
   for (const [id, S] of Object.entries(SKINS)) {
     const own = ownsSkin(prog, id);
     const on = (prog.skin || 'base') === id;
@@ -28,7 +39,12 @@ export function renderSkins() {
   }
   el.innerHTML = h;
   for (const cv of el.querySelectorAll('canvas[data-skin]')) drawSkinPreview(cv, cv.dataset.skin, 0.5);
+  // labo ouvert au moment de la réouverture : la carte se met à jour toute seule
+  clearTimeout(reopen);
+  if (!again) reopen = setTimeout(renderSkins, Math.min(HALLOWEEN.again - Date.now() + 1000, 2 ** 31 - 1));
 }
+
+let reopen = 0;
 
 // Roue d'un tirage de skin (v1.2.1) : pool = skins possibles, avec leurs chances (odds) ou à égalité
 export function spinSkin(win, pool, title) {
@@ -75,10 +91,11 @@ export function initSkins() {
     if (b.getAttribute('aria-disabled')) return flashDeny(b);
     Sfx.init();
     if (b.dataset.hw !== undefined) {
+      // skins possibles, calculés avant que la progression reçue n'y ajoute le skin obtenu
+      const pool = halloweenPool(prog, Date.now());
       const r = await request('skin_box', { kind: 'halloween' });
       if (!r.ok) return notice(r.msg);
       Sfx.unbox();
-      const pool = Object.keys(SKINS).filter(k => SKINS[k].src === 'halloween');
       await spinSkin(r.skin, pool, HALLOWEEN.name);
       return revealSkin(r.skin, 'BOX HALLOWEEN');
     }

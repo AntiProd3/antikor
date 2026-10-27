@@ -23,7 +23,7 @@ Version actuelle : **1.2.3** (affichée en bas à droite du jeu).
 
 ## Skins et cadeau du jour (v1.2)
 
-- **Skins** : l'apparence du vaisseau, sans effet sur la partie. Ils ne s'achètent pas : on les obtient avec la **Box Halloween** (199 noyaux, une seule par joueur, un des 4 skins d'Halloween) et la box du cadeau du 7e jour.
+- **Skins** : l'apparence du vaisseau, sans effet sur la partie. Ils ne s'achètent pas : on les obtient avec la **Box Halloween** (199 noyaux, un des 4 skins d'Halloween ; une seule par joueur jusqu'au 27 octobre 18 h, ensuite rachetable, mais elle ne redonne jamais un skin déjà possédé) et la box du cadeau du 7e jour.
 - **Cadeau du jour** : en se connectant chaque jour, des noyaux, des box Souche et Mutante, et une box de skin le 7e jour d'affilée. Un jour manqué fait repartir au jour 1.
 - Sur la **carte**, à côté de chaque niveau : les 3 meilleurs joueurs arrêtés à ce niveau.
 - **Codes promo** : il existe un passage secret pour les saisir…

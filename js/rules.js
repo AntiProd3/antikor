@@ -207,11 +207,22 @@ export function equipSkin(prog, id) {
   return null;
 }
 
-// Box Halloween : une seule par joueur, un skin d'Halloween tiré au sort (le Squelette est le plus rare)
-export function openHalloween(prog, rnd) {
-  if (prog.halloween) return { error: 'opened' };
-  if (prog.cores < HALLOWEEN.cost) return { error: 'not_enough' };
+// Box Halloween : un skin d'Halloween tiré au sort (le Squelette est le plus rare). Une seule par joueur avant
+// HALLOWEEN.again ; ensuite, rachetable, mais seulement parmi les skins d'Halloween pas encore possédés.
+export function halloweenOpen(now) {
+  return now >= HALLOWEEN.again;
+}
+
+export function halloweenPool(prog, now) {
   const pool = Object.keys(SKINS).filter(k => SKINS[k].src === 'halloween');
+  return halloweenOpen(now) ? pool.filter(k => !ownsSkin(prog, k)) : pool;
+}
+
+export function openHalloween(prog, rnd, now) {
+  if (!halloweenOpen(now) && prog.halloween) return { error: 'opened' };
+  const pool = halloweenPool(prog, now);
+  if (!pool.length) return { error: 'all_skins' };
+  if (prog.cores < HALLOWEEN.cost) return { error: 'not_enough' };
   let x = rnd() * pool.reduce((a, k) => a + SKINS[k].odds, 0),
     id = pool[pool.length - 1];
   for (const k of pool) {
