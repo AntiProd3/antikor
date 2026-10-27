@@ -74,7 +74,7 @@ export function addWeapon(id, r = P.owned[id] || 0) {
 export function recalc() {
   const L = id => P.passives[id] || 0;
   const TS = P.ts;
-  P.maxHp = 100 + TS.hp + 20 * L('heart');
+  P.maxHp = Math.round((100 + TS.hp + 20 * L('heart')) * (1 + (TS.hpMul || 0)));
   P.speed = 205 * (1 + 0.1 * L('boots') + TS.spd);
   P.dmg = 1 + 0.1 * L('powder') + TS.dmg;
   P.cd = Math.pow(0.92, L('trigger'));

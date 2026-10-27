@@ -6,6 +6,9 @@ import { hideTip } from './tooltips.js';
 
 export const $ = s => document.querySelector(s);
 
+// Badge de mutation (M1, M2, M3) à côté d'un pseudo (v1.2.2)
+export const mutBadge = m => (m > 0 ? `<span class="mut-b m${m}" title="Mutation ${m}">M${m}</span>` : '');
+
 export function show(id) {
   hideTip();
   if (id) $('#banner').classList.remove('show');

@@ -31,6 +31,7 @@ export function newProgress() {
     skin: 'base',
     halloween: null,
     daily: { last: null, day: 0 },
+    mutation: 0, // v1.2.2 : nombre de mutations (badge M1, M2, M3)
   };
 }
 
@@ -66,13 +67,42 @@ export function upgradeProgress(prog) {
   return changed;
 }
 
-// Effet des talents achetés, tel que la partie l'utilise
-export function talentStats(talents) {
+// ---------- Mutation (v1.2.2) ----------
+// Quand tous les talents sont au maximum (et le monde 3 atteint), le joueur peut muter : il perd ses talents
+// et ses noyaux, et gagne pour toujours +10 % de dégâts, +10 % de PV et +15 % de noyaux par mutation.
+// Armes, box, skins et carrière sont gardés.
+export const MUTATION = { max: 3, world: 3, dmg: 0.1, hp: 0.1, cores: 0.15 };
+
+export function mutationLevel(prog) {
+  return Math.min(MUTATION.max, prog.mutation | 0);
+}
+
+// Renvoie null si la mutation est possible, sinon la raison : 'max', 'locked' (monde 3 pas atteint),
+// 'not_maxed' (un talent n'est pas au maximum)
+export function mutateBlock(prog) {
+  if (mutationLevel(prog) >= MUTATION.max) return 'max';
+  if (worldOf(prog.career.max) + 1 < MUTATION.world) return 'locked';
+  if (TALENTS.some(t => talentLevel(prog, t.id) < t.max)) return 'not_maxed';
+  return null;
+}
+
+export function mutate(prog) {
+  const why = mutateBlock(prog);
+  if (why) return { error: why };
+  prog.talents = {};
+  prog.cores = 0;
+  prog.mutation = mutationLevel(prog) + 1;
+  return { mutation: prog.mutation };
+}
+
+// Effet des talents achetés (et des mutations), tel que la partie l'utilise
+export function talentStats(talents, mutation = 0) {
   const T = id => talents[id] || 0;
   return {
     slots: 1 + Math.min(T('slot'), 2),
     hp: 10 * T('hp'),
-    dmg: 0.05 * T('dmg'),
+    hpMul: MUTATION.hp * mutation, // PV max multipliés par 1 + hpMul
+    dmg: 0.05 * T('dmg') + MUTATION.dmg * mutation,
     spd: 0.04 * T('spd'),
     mag: 0.15 * T('mag'),
     gold: 0.1 * T('gold'),
@@ -115,7 +145,7 @@ export function equippedItem(prog) {
 export function playerSpec(prog) {
   const it = equippedItem(prog);
   return {
-    ts: talentStats(prog.talents),
+    ts: talentStats(prog.talents, mutationLevel(prog)),
     owned: ownedMap(prog.inv),
     start: { id: it.id, r: it.r },
     skin: ownsSkin(prog, prog.skin) ? prog.skin : 'base',
@@ -314,6 +344,8 @@ export function runRewards(prog, d) {
     );
     underRecord = old > 0;
   } else cores = Math.floor(waves * 3 + d.kills / 40 + d.bossKills * 8 + bonus);
+  // mutation : +15 % de noyaux par niveau
+  cores = Math.floor(cores * (1 + MUTATION.cores * mutationLevel(prog)));
   cores = d.quit ? 0 : Math.max(1, cores);
   prog.cores += cores;
   prog.totalKills += d.kills;

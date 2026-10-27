@@ -1,8 +1,8 @@
 // Classement de tous les joueurs (top 15 par statistique), calculé par le serveur.
 
 import { Sfx } from '../audio.js';
-import { account, request } from '../online/client.js';
-import { $, esc, show } from './dom.js';
+import { account, prog, request } from '../online/client.js';
+import { $, esc, mutBadge, show } from './dom.js';
 import { renderMenu } from './menu.js';
 
 // Statistiques classées : identifiant du serveur, onglet, titre, mise en forme de la valeur
@@ -49,11 +49,11 @@ function renderRank() {
     return;
   }
   const c = data.cats[cur] || { top: [], me: null };
-  const row = (rank, name, v, me) =>
-    `<li class="${me ? 'me' : ''} ${rank <= 3 ? 'p' + rank : ''}"><span class="rk">${rank}</span><span class="nm">${esc(name)}</span><span class="vl">${fmt(v)}</span></li>`;
-  let h = c.top.map((e, i) => row(i + 1, e.name, e.v, e.name === account.name)).join('');
+  const row = (rank, name, v, me, m) =>
+    `<li class="${me ? 'me' : ''} ${rank <= 3 ? 'p' + rank : ''}"><span class="rk">${rank}</span><span class="nm">${esc(name)} ${mutBadge(m)}</span><span class="vl">${fmt(v)}</span></li>`;
+  let h = c.top.map((e, i) => row(i + 1, e.name, e.v, e.name === account.name, e.m)).join('');
   const inTop = c.top.some(e => e.name === account.name);
-  if (!inTop && c.me) h += `<li class="gap">…</li>` + row(c.me.rank, account.name, c.me.v, true);
+  if (!inTop && c.me) h += `<li class="gap">…</li>` + row(c.me.rank, account.name, c.me.v, true, prog.mutation | 0);
   el.innerHTML =
     `<h3 class="rank-title">${title}</h3>` +
     (c.top.length

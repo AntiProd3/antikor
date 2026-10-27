@@ -9,7 +9,7 @@ import { equipped, ownedMap } from '../meta.js';
 import { account, logout, prog } from '../online/client.js';
 import { duo, leaveRoom } from '../online/duo.js';
 import { persist, save } from '../save.js';
-import { $, show, updateMuteLabels } from './dom.js';
+import { $, esc, mutBadge, show, updateMuteLabels } from './dom.js';
 import { playPressed } from './game.js';
 import { renderInv } from './inventory.js';
 import { renderLab } from './lab.js';
@@ -44,7 +44,7 @@ export function renderMenu() {
   const done = Object.keys(prog.career.stars).length;
   $('#menu-records').innerHTML =
     `<dt>Carrière</dt><dd>${done} / ${CAREER_LEVELS} niveaux · ${totStars} / ${CAREER_LEVELS * 3}★</dd><dt>Infini</dt><dd>${prog.best.endless ? 'vague ' + prog.best.endless : '—'}</dd><dt>Parties · victoires</dt><dd>${prog.runs} · ${prog.wins}</dd><dt>Germes éliminés</dt><dd>${(prog.totalKills || 0).toLocaleString('fr-FR')}</dd>`;
-  $('#acc-name').textContent = account.name || '';
+  $('#acc-name').innerHTML = esc(account.name || '') + ' ' + mutBadge(prog.mutation | 0);
   updateMuteLabels();
 }
 

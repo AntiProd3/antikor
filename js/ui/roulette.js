@@ -1,5 +1,5 @@
-// Roue d'ouverture des box (v1.2.1), façon CS:GO : une bande horizontale de possibilités en gris défile,
-// ralentit et s'arrête sur l'objet obtenu (tiré par le serveur), qui s'allume à sa couleur.
+// Roue d'ouverture des box (v1.2.1), façon CS:GO : une bande horizontale de possibilités, chacune à la couleur
+// de sa rareté, défile, ralentit et s'arrête sur l'objet obtenu (tiré par le serveur), qui s'agrandit (v1.2.2).
 
 import { Sfx } from '../audio.js';
 import { $ } from './dom.js';

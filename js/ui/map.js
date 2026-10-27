@@ -6,7 +6,7 @@ import { BOSSV } from '../data/enemies.js';
 import { ICON, svg } from '../icons.js';
 import { account, prog, request } from '../online/client.js';
 import { setG, setP } from '../sim/state.js';
-import { $, currentScreen, esc, show } from './dom.js';
+import { $, currentScreen, esc, mutBadge, show } from './dom.js';
 import { startGame } from './game.js';
 
 /* ---------- Carte de la carrière : chemin sinueux, niveau 1 en bas ---------- */
@@ -88,7 +88,7 @@ export function renderMap() {
     const b = board[L];
     if (b && b.top.length) {
       const side = p.x < W / 2 ? 'r' : 'l';
-      h += `<div class="lv-who ${side}" style="${side === 'r' ? 'left' : 'right'}:${side === 'r' ? p.x + 46 : W - p.x + 46}px;top:${p.y}px">${b.top.map(x => `<span class="${x.name === account.name ? 'me' : ''}">${esc(x.name)}</span>`).join('')}${b.n > b.top.length ? `<small>+${b.n - b.top.length}</small>` : ''}</div>`;
+      h += `<div class="lv-who ${side}" style="${side === 'r' ? 'left' : 'right'}:${side === 'r' ? p.x + 46 : W - p.x + 46}px;top:${p.y}px">${b.top.map(x => `<span class="${x.name === account.name ? 'me' : ''}">${esc(x.name)} ${mutBadge(x.m)}</span>`).join('')}${b.n > b.top.length ? `<small>+${b.n - b.top.length}</small>` : ''}</div>`;
     }
   }
   inner.innerHTML = h;
@@ -108,7 +108,7 @@ export function levelPop(L) {
   <dl class="kv"><dt>Manches</dt><dd>10 · boss aux manches 5 et 10</dd><dt>Boss</dt><dd><span style="color:${BOSSV[cb.mid].col}">${BOSSV[cb.mid].name}</span> puis <span style="color:${BOSSV[cb.fin].col}">${BOSSV[cb.fin].name}</span></dd>
   <dt>Difficulté</dt><dd><span class="diff">${Array.from({ length: 10 }, (_, i) => `<i class="${i < diff ? 'on' : ''}"></i>`).join('')}</span></dd>
 ${isFinale(L) ? `<dt>Épreuve</dt><dd class="finale">Fin du monde ${worldOf(L) + 1} : ennemis et boss bien plus coriaces</dd>` : ''}
-${board[L] && board[L].top.length ? `<dt>Arrêtés ici</dt><dd>${board[L].top.map(x => esc(x.name) + ' ' + x.stars + '★').join(' · ')}${board[L].n > board[L].top.length ? ` · +${board[L].n - board[L].top.length}` : ''}</dd>` : ''}
+${board[L] && board[L].top.length ? `<dt>Arrêtés ici</dt><dd>${board[L].top.map(x => esc(x.name) + ' ' + mutBadge(x.m) + ' ' + x.stars + '★').join(' · ')}${board[L].n > board[L].top.length ? ` · +${board[L].n - board[L].top.length}` : ''}</dd>` : ''}
   <dt>Étoiles</dt><dd>1★ terminer · 2★ ≥ 40% PV · 3★ ≥ 75% PV</dd>${st ? '' : `<dt>Premier passage</dt><dd class="nk">+${10 + 3 * L} noyaux bonus</dd>`}</dl>
   <div class="btnrow"><button class="btn btn-primary cut" data-go="${L}" style="font-size:30px;padding:14px 40px">JOUER</button><button class="btn cut" data-close>Fermer</button></div></div>`;
   pop.hidden = false;

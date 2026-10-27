@@ -456,3 +456,59 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* ---------- Mutation (v1.2.2) ---------- */
+.mut-b {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 3px;
+  font-family: var(--f-display);
+  font-size: 0.8em;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  color: #06111c;
+  background: #62ff9a;
+  box-shadow: 0 0 8px rgba(98, 255, 154, 0.6);
+}
+.mut-b.m2 {
+  background: #3ef2ff;
+  box-shadow: 0 0 8px rgba(62, 242, 255, 0.6);
+}
+.mut-b.m3 {
+  background: #ff3d8b;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255, 61, 139, 0.7);
+}
+.mut-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  background: rgba(12, 20, 40, 0.85);
+}
+.mut-card.ready {
+  border-color: #62ff9a;
+  box-shadow: 0 0 18px rgba(98, 255, 154, 0.35);
+}
+.mut-card > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mut-card b {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 18px;
+}
+.mut-card small {
+  font-size: 13px;
+  color: var(--dim);
+}
+.mutate-box {
+  width: min(100%, 480px);
+}

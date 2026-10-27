@@ -25,6 +25,7 @@ import { initRank } from './ui/rank.js';
 import { initSkins } from './ui/skins.js';
 import { initDaily } from './ui/daily.js';
 import { initPromo } from './ui/promo.js';
+import { initMutation } from './ui/mutation.js';
 import { initTooltips } from './ui/tooltips.js';
 
 // Une étape de simulation (aussi utilisée par les tests) : la commande du joueur local, puis la partie avance.
@@ -84,6 +85,7 @@ initRank();
 initSkins();
 initDaily();
 initPromo();
+initMutation();
 addEventListener('resize', resize);
 resize();
 initFloor();
