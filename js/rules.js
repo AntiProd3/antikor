@@ -41,8 +41,11 @@ export function talentLevel(prog, id) {
   return prog.talents[id] || 0;
 }
 
-export function talentCost(t, l) {
-  return t.costs ? t.costs[l] : t.cost * (l + 1);
+// Prix du niveau l + 1 d'un talent. Après une mutation, les prix suivent le bonus de noyaux (+15 % par mutation) :
+// racheter les talents demande toujours le même effort (le même nombre de parties).
+export function talentCost(t, l, mutation = 0) {
+  const base = t.costs ? t.costs[l] : t.cost * (l + 1);
+  return Math.round(base * (1 + MUTATION.cores * mutation));
 }
 
 // Arsenal : le niveau n s'achète une fois le monde n + 1 atteint en carrière (monde 2 : 2 armes, monde 3 : 3 armes).
@@ -121,7 +124,7 @@ export function buyTalent(prog, id) {
   const l = talentLevel(prog, id);
   if (l >= t.max) return 'max';
   if (talentGate(t, l, prog.career.max)) return 'locked';
-  const cost = talentCost(t, l);
+  const cost = talentCost(t, l, mutationLevel(prog));
   if (prog.cores < cost) return 'not_enough';
   prog.cores -= cost;
   prog.talents[id] = l + 1;

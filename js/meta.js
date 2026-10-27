@@ -3,7 +3,10 @@
 import { prog } from './online/client.js';
 import * as rules from './rules.js';
 
-export { talentCost } from './rules.js';
+// prix d'un talent pour ce compte (il dépend du niveau de mutation)
+export function talentCost(t, l) {
+  return rules.talentCost(t, l, rules.mutationLevel(prog));
+}
 
 export function T(id) {
   return rules.talentLevel(prog, id);

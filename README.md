@@ -8,7 +8,7 @@ Jeu d'arcade néon en HTML/CSS/JavaScript sans dépendance, publié avec GitHub 
 - Code : `index.html` (écrans), `css/` (styles), `js/` (jeu : `data/` réglages, `sim/` simulation, `render/` dessin, `ui/` interface, `online/` connexion au serveur) ; `js/rules.js` contient les règles de progression partagées avec le serveur
 - En local : lancer un petit serveur dans le dossier (`python3 -m http.server`) puis ouvrir http://localhost:8000/ (ouvrir le fichier directement ne marche pas avec les modules)
 
-Version actuelle : **1.2.2** (affichée en bas à droite du jeu).
+Version actuelle : **1.2.3** (affichée en bas à droite du jeu).
 
 ## Armes, raretés et box
 
@@ -27,7 +27,7 @@ Version actuelle : **1.2.2** (affichée en bas à droite du jeu).
 - **Cadeau du jour** : en se connectant chaque jour, des noyaux, des box Souche et Mutante, et une box de skin le 7e jour d'affilée. Un jour manqué fait repartir au jour 1.
 - Sur la **carte**, à côté de chaque niveau : les 3 meilleurs joueurs arrêtés à ce niveau.
 - **Codes promo** : il existe un passage secret pour les saisir…
-- **Mutation** (v1.2.2) : tous les talents au maximum et le monde 3 atteint ? On peut muter : talents et noyaux repartent de zéro, mais on gagne pour toujours +10 % de dégâts, +10 % de PV et +15 % de noyaux, et un badge M1, M2 puis M3 (3 mutations au plus).
+- **Mutation** (v1.2.2) : tous les talents au maximum et le monde 3 atteint ? On peut muter : talents et noyaux repartent de zéro, mais on gagne pour toujours +10 % de dégâts, +10 % de PV et +15 % de noyaux, et un badge M1, M2 puis M3 (3 mutations au plus). Les talents coûtent 15 % de plus par mutation : avec le bonus de noyaux, les racheter demande toujours le même effort.
 
 ## Boss
 
