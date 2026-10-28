@@ -300,7 +300,7 @@
 .lv-who.l {
   align-items: flex-end;
 }
-.lv-who span {
+.lv-who > span {
   padding: 1px 6px;
   border: 1px solid var(--line);
   background: rgba(7, 11, 22, 0.85);
@@ -309,9 +309,13 @@
   text-overflow: ellipsis;
   max-width: 100%;
 }
-.lv-who span.me {
+.lv-who > span.me {
   color: var(--cyan);
   border-color: var(--cyan);
+}
+/* badge de mutation : garde son propre style (pas celui de l'étiquette du pseudo) */
+.lv-who .mut-b {
+  font-size: 0.85em;
 }
 .lv-who small {
   font-size: 10px;
