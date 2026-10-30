@@ -9,8 +9,10 @@ import { G, P } from './state.js';
 
 export function candidates(ctx) {
   const list = [];
-  const wSlots = P.weapons.length < P.ts.slots,
-    pSlots = Object.keys(P.passives).length < 6;
+  // un coffre n'apporte que des améliorations de ce qu'on a déjà (niveau d'arme, d'équipement, évolution) :
+  // jamais d'arme ni d'équipement nouveaux
+  const wSlots = P.weapons.length < P.ts.slots && ctx !== 'chest',
+    pSlots = Object.keys(P.passives).length < 6 && ctx !== 'chest';
   for (const w of P.weapons) {
     const d = WEAPONS[w.id];
     if (w.lvl < 5) list.push({ kind: 'wup', id: w.id, w: 10 });
